@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using ThinkingHome.NooLite.Ports;
 
 namespace ThinkingHome.NooLite
@@ -7,16 +8,36 @@ namespace ThinkingHome.NooLite
     {
         #region common
 
+        private const int READING_INTERVAL = 50;
+        private const int BUFFER_SIZE = 17;
+        
         private readonly SerialPort device;
+        private readonly Timer timer;
 
         public MTRFXXAdapter(string portName)
         {
             device = new SerialPort(portName, 9600);
+            timer = new Timer(TimerCallback, null, Timeout.Infinite, READING_INTERVAL);
+        }
+
+        private void TimerCallback(object state)
+        {
+            lock (device)
+            {
+                var bytes = new byte[BUFFER_SIZE];
+
+                while (device.BytesToRead >= BUFFER_SIZE)
+                {
+                    device.Read(bytes, 0, BUFFER_SIZE);
+                    DataReceived?.Invoke(this, bytes);
+                }
+            }
         }
 
         public void Open()
         {
             device.Open();
+            timer.Change(0, READING_INTERVAL);
         }
 
         public bool IsOpened => device.IsOpen;
@@ -24,6 +45,7 @@ namespace ThinkingHome.NooLite
         public void Dispose()
         {
             device.Dispose();
+            timer.Dispose();
         }
 
         #endregion
@@ -31,11 +53,6 @@ namespace ThinkingHome.NooLite
         #region commands
 
         public event Action<object, byte[]> DataReceived;
-
-        private void OnDataReceived(object sender, byte[] data)
-        {
-            DataReceived?.Invoke(this, data);
-        }
 
         public void SendCommand(MTRFXXMode mode, MTRFXXAction action, byte channel, MTRFXXCommand command,
             MTRFXXRepeatCount repeatCount = MTRFXXRepeatCount.NoRepeat, MTRFXXDataFormat format = MTRFXXDataFormat.NoData,
