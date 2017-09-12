@@ -2,11 +2,9 @@
   <PropertyGroup>
     <VersionPrefix>4.0.0</VersionPrefix>
     <VersionSuffix>alpha1</VersionSuffix>
-
     <Authors>Dmitry Andriyanov &lt;dima117a@gmail.com&gt;</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Copyright>Thinking-Home.RU © 2017</Copyright>
-
     <PackageTags>thinking-home;core;noolite</PackageTags>
     <PackageProjectUrl>https://github.com/thinking-home/noolite</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/thinking-home/noolite/blob/master/LICENSE</PackageLicenseUrl>

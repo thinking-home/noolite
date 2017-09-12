@@ -19,21 +19,36 @@ namespace ThinkingHome.NooLite.DebugConsole
                 adapter.DataReceived += AdapterOnDataReceived;
                 
                 adapter.Open();
+
+                Console.WriteLine("exit service mode");
+                adapter.ExitServiceMode();
+
+                Console.ReadKey();
+
+                Console.WriteLine("on");
+                adapter.On(12);
+
+                Console.ReadKey();
                 
-                adapter.SendCommand(MTRFXXMode.Service, MTRFXXAction.SendCommand, 0, MTRFXXCommand.Off);
+                Console.WriteLine("bind");
+                adapter.Bind(13);
+
+                Console.ReadKey();
                 
-                Thread.Sleep(200);
+                Console.WriteLine("bind: start");
+                adapter.BindStart(13);
+
+                Console.ReadKey();
                 
-                adapter.SendCommand(MTRFXXMode.Service, MTRFXXAction.SendCommand, 0, MTRFXXCommand.On, MTRFXXRepeatCount.Three);
-                
-                Thread.Sleep(200);
+                Console.WriteLine("bind: stop");
+                adapter.BindStop();
             }
         }
 
-        private static void AdapterOnDataReceived(object o, byte[] bytes)
+        private static void AdapterOnDataReceived(object o, MTRFXXReceivedData result)
         {
-            var msg = string.Join("=", bytes.Select(b => b.ToString()));
-            Console.WriteLine($"R: {msg}");
+            //var msg = string.Join("=", bytes.Select(b => b.ToString()));
+            Console.WriteLine(result);
         }
     }
 }
