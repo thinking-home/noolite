@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <AssemblyName>noolite</AssemblyName>
+        <TargetFramework>netcoreapp2.0</TargetFramework>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="PowerArgs" Version="3.0.0"/>
+    </ItemGroup>
+</Project>

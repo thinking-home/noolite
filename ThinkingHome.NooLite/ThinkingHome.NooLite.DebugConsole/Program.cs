@@ -25,23 +25,45 @@ namespace ThinkingHome.NooLite.DebugConsole
 
                 Console.ReadKey();
 
-                Console.WriteLine("on");
-                adapter.On(12);
-
-                Console.ReadKey();
-                
                 Console.WriteLine("bind");
                 adapter.Bind(13);
 
                 Console.ReadKey();
                 
-                Console.WriteLine("bind: start");
-                adapter.BindStart(13);
+                
+//                Console.WriteLine("unbind");
+//                adapter.UnBind(13);
+//
+//                Console.ReadKey();
+
+                Console.WriteLine("on");
+                adapter.On(13);
+
+                Console.ReadKey();
+
+                Console.WriteLine("off");
+                adapter.Off(13);
 
                 Console.ReadKey();
                 
-                Console.WriteLine("bind: stop");
-                adapter.BindStop();
+                Console.WriteLine("on");
+                adapter.On(13);    
+
+                Console.ReadKey();
+
+                Console.WriteLine("off");
+                adapter.Off(13);
+
+                Console.ReadKey();
+                
+                
+//                Console.WriteLine("bind: start");
+//                adapter.BindStart(13);
+//
+//                Console.ReadKey();
+//                
+//                Console.WriteLine("bind: stop");
+//                adapter.BindStop();
             }
         }
 
