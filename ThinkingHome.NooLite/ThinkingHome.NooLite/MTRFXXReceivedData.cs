@@ -5,41 +5,61 @@ namespace ThinkingHome.NooLite
 {
     public class MTRFXXReceivedData
     {
-        private readonly byte[] data;
-        
         private const byte START_MARKER = 173;
         
         private const byte STOP_MARKER = 174;
 
         private const int BUFFER_SIZE = 17;
-        
-        public MTRFXXMode Mode => (MTRFXXMode) data[1];
-        
-        public MTRFXXCommandResult Result => (MTRFXXCommandResult) data[2];
 
-        public int Remains => Mode == MTRFXXMode.RX | Mode == MTRFXXMode.RXF ? 0 : data[3];
-        
-        public int Channel => data[4];
-
-        public MTRFXXCommand Command => (MTRFXXCommand) data[5];
-
-        public byte DataFormat => data[6];
-        
-        public byte Data1 => data[7];
-        public byte Data2 => data[8];
-        public byte Data3 => data[9];
-        public byte Data4 => data[10];
-
-        public UInt32 DeviceId => BitConverter.ToUInt32(data, 11);
-
-        public MTRFXXReceivedData(byte[] bytes)
+        private static UInt32 ParseDeviceId(byte[] data)
         {
-            if (bytes == null) throw new ArgumentNullException(nameof(bytes));
-            if (bytes.Length != BUFFER_SIZE) throw new ArgumentException("Invalid buffer length", nameof(bytes));
-            if (bytes.First() != START_MARKER) throw new ArgumentException("Invalid start marker", nameof(bytes));
-            if (bytes.Last() != STOP_MARKER) throw new ArgumentException("Invalid stop marker", nameof(bytes));
+            UInt32 res = data[11];
+            res = (res << 8) + data[12];
+            res = (res << 8) + data[13];
+            res = (res << 8) + data[14];
 
-            data = bytes;
+            return res;
+        }
+
+        public readonly MTRFXXMode Mode;
+        
+        public readonly MTRFXXCommandResult Result;
+
+        public readonly int Remains;
+        
+        public readonly int Channel;
+
+        public readonly MTRFXXCommand Command;
+
+        public readonly byte DataFormat;
+        
+        public readonly byte Data1;
+        public readonly byte Data2;
+        public readonly byte Data3;
+        public readonly byte Data4;
+
+        public readonly UInt32 DeviceId;
+
+        public MTRFXXReceivedData(byte[] data)
+        {
+            if (data == null) throw new ArgumentNullException(nameof(data));
+            if (data.Length != BUFFER_SIZE) throw new ArgumentException("Invalid buffer length", nameof(data));
+            if (data.First() != START_MARKER) throw new ArgumentException("Invalid start marker", nameof(data));
+            if (data.Last() != STOP_MARKER) throw new ArgumentException("Invalid stop marker", nameof(data));
+            
+            Mode = (MTRFXXMode) data[1];
+            Result = (MTRFXXCommandResult) data[2];
+            Remains = Mode == MTRFXXMode.RX | Mode == MTRFXXMode.RXF ? 0 : data[3];
+            Channel = data[4];
+            Command = (MTRFXXCommand) data[5];
+
+            DataFormat = data[6];
+            Data1 = data[7];
+            Data2 = data[8];
+            Data3 = data[9];
+            Data4 = data[10];
+
+            DeviceId = ParseDeviceId(data);
         }
 
         public override string ToString()

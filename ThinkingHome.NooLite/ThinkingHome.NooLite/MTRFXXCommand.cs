@@ -27,6 +27,16 @@
         Roll_Colour = 16,
         Switch_Colour = 17,
         Switch_Mode = 18,
-        Speed_Mode_Back = 19
+        Speed_Mode_Back = 19,
+        
+        Battery_Low = 20,
+        Sens_Temp_Humi = 21,
+        Temporary_On = 25,
+        Modes = 26,
+        Read_State = 128,
+        Write_State = 129,
+        Send_State = 130,
+        Service = 131,
+        Clear_memory = 132
     }
 }
