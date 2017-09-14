@@ -1,4 +1,5 @@
 using System;
+using ThinkingHome.NooLite.Params;
 using Xunit;
 
 namespace ThinkingHome.NooLite.Tests.ReceivedData
@@ -29,7 +30,7 @@ namespace ThinkingHome.NooLite.Tests.ReceivedData
             const byte RXF_CODE = 3;
             byte[] bytes = GetBytes().Set(1, RXF_CODE);
 
-            var data = new NooLite.MTRFXXReceivedData(bytes);
+            var data = new NooLite.ReceivedData(bytes);
 
             Assert.Equal(MTRFXXMode.RXF, data.Mode);
         }
@@ -40,9 +41,9 @@ namespace ThinkingHome.NooLite.Tests.ReceivedData
             const byte NO_RESPONSE_CODE = 1;
             byte[] bytes = GetBytes().Set(2, NO_RESPONSE_CODE);
 
-            var data = new NooLite.MTRFXXReceivedData(bytes);
+            var data = new NooLite.ReceivedData(bytes);
 
-            Assert.Equal(MTRFXXCommandResult.NoResponse, data.Result);
+            Assert.Equal(CommandResult.NoResponse, data.Result);
         }
 
         [Fact]
@@ -51,7 +52,7 @@ namespace ThinkingHome.NooLite.Tests.ReceivedData
             const byte REMAINS_TEST_VALUE = 133;
             byte[] bytes = GetBytes().Set(3, REMAINS_TEST_VALUE);
 
-            var data = new NooLite.MTRFXXReceivedData(bytes);
+            var data = new NooLite.ReceivedData(bytes);
 
             Assert.Equal(REMAINS_TEST_VALUE, data.Remains);
         }
@@ -62,7 +63,7 @@ namespace ThinkingHome.NooLite.Tests.ReceivedData
             const byte CHANNEL_TEST_VALUE = 8;
             byte[] bytes = GetBytes().Set(4, CHANNEL_TEST_VALUE);
 
-            var data = new NooLite.MTRFXXReceivedData(bytes);
+            var data = new NooLite.ReceivedData(bytes);
 
             Assert.Equal(CHANNEL_TEST_VALUE, data.Channel);
         }
@@ -73,7 +74,7 @@ namespace ThinkingHome.NooLite.Tests.ReceivedData
             const byte COMMAND_SEND_STATE_CODE = 130;
             byte[] bytes = GetBytes().Set(5, COMMAND_SEND_STATE_CODE);
 
-            var data = new NooLite.MTRFXXReceivedData(bytes);
+            var data = new NooLite.ReceivedData(bytes);
 
             Assert.Equal(MTRFXXCommand.SendState, data.Command);
         }
@@ -88,7 +89,7 @@ namespace ThinkingHome.NooLite.Tests.ReceivedData
                 .Set(6, FMT_TEST_VALUE)
                 .Set(7, TEST_DATA);
 
-            var data = new NooLite.MTRFXXReceivedData(bytes);
+            var data = new NooLite.ReceivedData(bytes);
 
             Assert.Equal(FMT_TEST_VALUE, data.DataFormat);
             Assert.Equal(22, data.Data1);
@@ -103,7 +104,7 @@ namespace ThinkingHome.NooLite.Tests.ReceivedData
             byte[] bytesOfId = {0, 21, 5, 13};
             byte[] bytes = GetBytes().Set(11, bytesOfId);
 
-            var data = new NooLite.MTRFXXReceivedData(bytes);
+            var data = new NooLite.ReceivedData(bytes);
 
             Assert.Equal((UInt32) 1377549, data.DeviceId);
         }

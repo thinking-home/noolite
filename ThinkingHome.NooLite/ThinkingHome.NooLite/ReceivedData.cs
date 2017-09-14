@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
+using ThinkingHome.NooLite.Params;
 
 namespace ThinkingHome.NooLite
 {
-    public class MTRFXXReceivedData
+    public class ReceivedData
     {
         private const byte START_MARKER = 173;
         
@@ -23,7 +24,7 @@ namespace ThinkingHome.NooLite
 
         public readonly MTRFXXMode Mode;
         
-        public readonly MTRFXXCommandResult Result;
+        public readonly CommandResult Result;
 
         public readonly int Remains;
         
@@ -40,7 +41,7 @@ namespace ThinkingHome.NooLite
 
         public readonly UInt32 DeviceId;
         
-        public MTRFXXReceivedData(byte[] data)
+        public ReceivedData(byte[] data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             if (data.Length != BUFFER_SIZE) throw new ArgumentException("Invalid buffer length", nameof(data));
@@ -48,7 +49,7 @@ namespace ThinkingHome.NooLite
             if (data.Last() != STOP_MARKER) throw new ArgumentException("Invalid stop marker", nameof(data));
             
             Mode = (MTRFXXMode) data[1];
-            Result = (MTRFXXCommandResult) data[2];
+            Result = (CommandResult) data[2];
             Remains = Mode == MTRFXXMode.RX | Mode == MTRFXXMode.RXF ? 0 : data[3];
             Channel = data[4];
             Command = (MTRFXXCommand) data[5];
@@ -70,9 +71,9 @@ namespace ThinkingHome.NooLite
                    $"}}";
         }
 
-        public static MTRFXXReceivedData Parse(byte[] data)
+        public static ReceivedData Parse(byte[] data)
         {
-            return new MTRFXXReceivedData(data);
+            return new ReceivedData(data);
         }
     }
 }

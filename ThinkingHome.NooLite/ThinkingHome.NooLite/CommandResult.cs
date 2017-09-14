@@ -1,6 +1,6 @@
 ﻿namespace ThinkingHome.NooLite
 {
-    public enum MTRFXXCommandResult
+    public enum CommandResult
     {
         Success = 0,
         

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using ThinkingHome.NooLite.Params;
 using ThinkingHome.NooLite.Ports;
 
 namespace ThinkingHome.NooLite
@@ -29,7 +30,7 @@ namespace ThinkingHome.NooLite
                 while (device.BytesToRead >= BUFFER_SIZE)
                 {
                     device.Read(bytes, 0, BUFFER_SIZE);
-                    DataReceived?.Invoke(this, MTRFXXReceivedData.Parse(bytes));
+                    DataReceived?.Invoke(this, ReceivedData.Parse(bytes));
                 }
             }
         }
@@ -52,7 +53,7 @@ namespace ThinkingHome.NooLite
 
         #region commands
 
-        public event Action<object, MTRFXXReceivedData> DataReceived;
+        public event Action<object, ReceivedData> DataReceived;
 
         public void SendCommand(MTRFXXMode mode, MTRFXXAction action, byte channel, MTRFXXCommand command,
             MTRFXXRepeatCount repeatCount = MTRFXXRepeatCount.NoRepeat, MTRFXXDataFormat format = MTRFXXDataFormat.NoData,

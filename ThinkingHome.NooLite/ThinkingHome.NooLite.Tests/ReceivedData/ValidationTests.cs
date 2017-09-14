@@ -12,7 +12,7 @@ namespace ThinkingHome.NooLite.Tests.ReceivedData
         {
             byte[] nullReceivedData = null;
 
-            Exception ex = Assert.ThrowsAny<Exception>(() => new MTRFXXReceivedData(nullReceivedData));
+            Exception ex = Assert.ThrowsAny<Exception>(() => new NooLite.ReceivedData(nullReceivedData));
             
             Assert.Contains("null", ex.Message);
         }
@@ -22,7 +22,7 @@ namespace ThinkingHome.NooLite.Tests.ReceivedData
         {
             byte[] invalidSizeData = new byte[3];
 
-            Exception ex = Assert.ThrowsAny<Exception>(() => new MTRFXXReceivedData(invalidSizeData));
+            Exception ex = Assert.ThrowsAny<Exception>(() => new NooLite.ReceivedData(invalidSizeData));
             
             Assert.Contains("length", ex.Message);
         }
@@ -34,7 +34,7 @@ namespace ThinkingHome.NooLite.Tests.ReceivedData
             byte[] testData = new byte[VALID_DATA_SIZE];
             testData[0] = 124;
 
-            Exception ex = Assert.ThrowsAny<Exception>(() => new MTRFXXReceivedData(testData));
+            Exception ex = Assert.ThrowsAny<Exception>(() => new NooLite.ReceivedData(testData));
             
             Assert.Contains("start", ex.Message);
         }
@@ -46,7 +46,7 @@ namespace ThinkingHome.NooLite.Tests.ReceivedData
             testData[0] = 173;    // valid start marker
             testData[VALID_DATA_SIZE - 1] = 124;
 
-            Exception ex = Assert.ThrowsAny<Exception>(() => new MTRFXXReceivedData(testData));
+            Exception ex = Assert.ThrowsAny<Exception>(() => new NooLite.ReceivedData(testData));
             
             Assert.Contains("stop", ex.Message);
         }

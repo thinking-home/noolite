@@ -1,4 +1,4 @@
-﻿namespace ThinkingHome.NooLite
+﻿namespace ThinkingHome.NooLite.Params
 {
     public enum MTRFXXCommand : byte
     {

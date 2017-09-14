@@ -68,7 +68,7 @@ namespace ThinkingHome.NooLite.DebugConsole
             }
         }
 
-        private static void AdapterOnDataReceived(object o, MTRFXXReceivedData result)
+        private static void AdapterOnDataReceived(object o, ReceivedData result)
         {
             //var msg = string.Join("=", bytes.Select(b => b.ToString()));
             Console.WriteLine(result);

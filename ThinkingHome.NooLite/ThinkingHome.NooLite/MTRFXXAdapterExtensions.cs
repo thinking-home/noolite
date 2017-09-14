@@ -1,4 +1,6 @@
-﻿namespace ThinkingHome.NooLite
+﻿using ThinkingHome.NooLite.Params;
+
+namespace ThinkingHome.NooLite
 {
     public static class MTRFXXAdapterExtensions
     {
