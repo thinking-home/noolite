@@ -52,17 +52,17 @@
 
         public static void ChangeLedColor(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.Switch_Colour, channel);
+            Send(adapter, MTRFXXCommand.ChangeColor, channel);
         }
 
         public static void ChangeLedColorMode(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.Switch_Mode, channel);
+            Send(adapter, MTRFXXCommand.ChangeColorMode, channel);
         }
 
         public static void ChangeLedColorSpeed(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.Speed_Mode_Back, channel);
+            Send(adapter, MTRFXXCommand.ChangeColorSpeed, channel);
         }
 
         // binding tx
@@ -96,7 +96,7 @@
         {
             adapter.SendCommand(MTRFXXMode.RX, MTRFXXAction.ClearAllChannels, 0, MTRFXXCommand.None, 
                 MTRFXXRepeatCount.NoRepeat, MTRFXXDataFormat.NoData, new byte[] { 170, 85, 170, 85 });
-        }
+        } 
 
         public static void ExitServiceMode(this MTRFXXAdapter adapter)
         {

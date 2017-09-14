@@ -39,7 +39,7 @@ namespace ThinkingHome.NooLite
         public readonly byte Data4;
 
         public readonly UInt32 DeviceId;
-
+        
         public MTRFXXReceivedData(byte[] data)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));

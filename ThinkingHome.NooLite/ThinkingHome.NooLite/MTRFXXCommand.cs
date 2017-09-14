@@ -24,19 +24,19 @@
         Bind = 15,
         Unbind = 9,
         
-        Roll_Colour = 16,
-        Switch_Colour = 17,
-        Switch_Mode = 18,
-        Speed_Mode_Back = 19,
+        StartColorChanging = 16,
+        ChangeColor = 17,
+        ChangeColorMode = 18,
+        ChangeColorSpeed = 19,
         
-        Battery_Low = 20,
-        Sens_Temp_Humi = 21,
-        Temporary_On = 25,
+        LowBatteryStatus = 20,
+        MicroclimateData = 21,
+        TemporarySwitchOn = 25,
         Modes = 26,
-        Read_State = 128,
-        Write_State = 129,
-        Send_State = 130,
+        ReadState = 128,
+        WriteState = 129,
+        SendState = 130,
         Service = 131,
-        Clear_memory = 132
+        ClearMemory = 132
     }
 }

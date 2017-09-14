@@ -75,7 +75,7 @@ namespace ThinkingHome.NooLite.Tests.ReceivedData
 
             var data = new NooLite.MTRFXXReceivedData(bytes);
 
-            Assert.Equal(MTRFXXCommand.Send_State, data.Command);
+            Assert.Equal(MTRFXXCommand.SendState, data.Command);
         }
 
         [Fact]
