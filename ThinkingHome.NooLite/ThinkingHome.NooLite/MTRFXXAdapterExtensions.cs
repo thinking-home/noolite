@@ -1,83 +1,238 @@
-﻿using ThinkingHome.NooLite.Params;
+﻿using System;
+using ThinkingHome.NooLite.Params;
 
 namespace ThinkingHome.NooLite
 {
+    public enum CmdMode
+    {
+        Default,
+        NooLiteF,
+        Broadcast
+    }
+
     public static class MTRFXXAdapterExtensions
     {
-        private static void Send(MTRFXXAdapter adapter, MTRFXXCommand command, byte channel = 0)
+        #region private
+        
+        private static void Send(MTRFXXAdapter adapter, MTRFXXCommand command, CmdMode mode, byte channel = 0)
         {
-            adapter.SendCommand(MTRFXXMode.TX, MTRFXXAction.SendCommand, channel, command);
+            var _mode = mode == CmdMode.Default ? MTRFXXMode.TX : MTRFXXMode.TXF;
+            var _action = mode == CmdMode.Broadcast ? MTRFXXAction.SendBroadcastCommand : MTRFXXAction.SendCommand;
+
+            adapter.SendCommand(_mode, _action, channel, command);
         }
 
-        private static void SendData(MTRFXXAdapter adapter, MTRFXXCommand command, byte channel, MTRFXXDataFormat format, params byte[] data)
+        private static void Send(MTRFXXAdapter adapter, MTRFXXCommand command, UInt32 deviceId)
         {
-            adapter.SendCommand(MTRFXXMode.TX, MTRFXXAction.SendCommand, channel, command, MTRFXXRepeatCount.NoRepeat, format, data);
+            var _mode = MTRFXXMode.TXF;
+            var _action = MTRFXXAction.SendTargetedCommand;
+
+            adapter.SendCommand(_mode, _action, 0, command, target: deviceId);
+        }
+
+        private static void SendData(MTRFXXAdapter adapter, MTRFXXCommand command, CmdMode mode, byte channel, MTRFXXDataFormat format, params byte[] data)
+        {
+            var _mode = mode == CmdMode.Default ? MTRFXXMode.TX : MTRFXXMode.TXF;
+            var _action = mode == CmdMode.Broadcast ? MTRFXXAction.SendBroadcastCommand : MTRFXXAction.SendCommand;
+            
+            adapter.SendCommand(_mode, _action, channel, command, MTRFXXRepeatCount.NoRepeat, format, data);
         }
         
-        // brightness
-        public static void On(this MTRFXXAdapter adapter, byte channel)
+        private static void SendData(MTRFXXAdapter adapter, MTRFXXCommand command, UInt32 deviceId, MTRFXXDataFormat format, params byte[] data)
         {
-            Send(adapter, MTRFXXCommand.On, channel);
-        }
-
-        public static void Off(this MTRFXXAdapter adapter, byte channel)
-        {
-            Send(adapter, MTRFXXCommand.Off, channel);
-        }
-
-        public static void Toggle(this MTRFXXAdapter adapter, byte channel)
-        {
-            Send(adapter, MTRFXXCommand.Switch, channel);
-        }
-
-        public static void SetBrightness(this MTRFXXAdapter adapter, byte channel, byte brightness)
-        {
-            SendData(adapter, MTRFXXCommand.SetBrightness, channel, MTRFXXDataFormat.OneByteData, brightness);
-        }
-
-        // presets
-        public static void SavePreset(this MTRFXXAdapter adapter, byte channel)
-        {
-            Send(adapter, MTRFXXCommand.SavePreset, channel);    
-        }
-
-        public static void LoadPreset(this MTRFXXAdapter adapter, byte channel)
-        {
-            Send(adapter, MTRFXXCommand.LoadPreset, channel);
-        }
-
-        // led
-        public static void SetLedColor(this MTRFXXAdapter adapter, byte channel, byte valueR, byte valueG, byte valueB)
-        {
-            SendData(adapter, MTRFXXCommand.SetBrightness, channel, MTRFXXDataFormat.LED, valueR, valueG, valueB);
-        }
-
-        public static void ChangeLedColor(this MTRFXXAdapter adapter, byte channel)
-        {
-            Send(adapter, MTRFXXCommand.ChangeColor, channel);
-        }
-
-        public static void ChangeLedColorMode(this MTRFXXAdapter adapter, byte channel)
-        {
-            Send(adapter, MTRFXXCommand.ChangeColorMode, channel);
-        }
-
-        public static void ChangeLedColorSpeed(this MTRFXXAdapter adapter, byte channel)
-        {
-            Send(adapter, MTRFXXCommand.ChangeColorSpeed, channel);
-        }
-
-        // binding tx
-        public static void Bind(this MTRFXXAdapter adapter, byte channel)
-        {
-            Send(adapter, MTRFXXCommand.Bind, channel);
-        }
-
-        public static void UnBind(this MTRFXXAdapter adapter, byte channel)
-        {
-            Send(adapter, MTRFXXCommand.Unbind, channel);
+            var _mode = MTRFXXMode.TXF;
+            var _action = MTRFXXAction.SendTargetedCommand;
+            
+            adapter.SendCommand(_mode, _action, 0, command, MTRFXXRepeatCount.NoRepeat, format, data, target: deviceId);
         }
         
+        #endregion
+
+        #region brightness
+
+        #region cmd: on
+
+        public static void On(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        {
+            Send(adapter, MTRFXXCommand.On, mode, channel);
+        }
+
+        public static void On(this MTRFXXAdapter adapter, UInt32 deviceId)
+        {
+            Send(adapter, MTRFXXCommand.On, deviceId);
+        }
+
+        #endregion
+        
+        #region cmd: off
+
+        public static void Off(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        {
+            Send(adapter, MTRFXXCommand.Off, mode, channel);
+        }
+
+        public static void Off(this MTRFXXAdapter adapter, UInt32 deviceId)
+        {
+            Send(adapter, MTRFXXCommand.Off, deviceId);
+        }
+
+        #endregion
+
+        #region cmd: switch
+
+        public static void Switch(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        {
+            Send(adapter, MTRFXXCommand.Switch, mode, channel);
+        }
+
+        public static void Switch(this MTRFXXAdapter adapter, UInt32 deviceId)
+        {
+            Send(adapter, MTRFXXCommand.Switch, deviceId);
+        }
+
+        #endregion
+        
+        #region cmd: set brightness
+
+        public static void SetBrightness(this MTRFXXAdapter adapter, CmdMode mode, byte channel, byte brightness)
+        {
+            SendData(adapter, MTRFXXCommand.SetBrightness, mode, channel, MTRFXXDataFormat.OneByteData, brightness);
+        }
+
+        public static void SetBrightness(this MTRFXXAdapter adapter, UInt32 deviceId, byte brightness)
+        {
+            SendData(adapter, MTRFXXCommand.SetBrightness, deviceId, MTRFXXDataFormat.OneByteData, brightness);
+        }
+
+        #endregion
+        
+        #endregion
+
+        #region presets
+
+        #region cmd: save preset 
+
+        public static void SavePreset(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        {
+            Send(adapter, MTRFXXCommand.SavePreset, mode, channel);
+        }
+
+        public static void SavePreset(this MTRFXXAdapter adapter, UInt32 deviceId)
+        {
+            Send(adapter, MTRFXXCommand.SavePreset, deviceId);
+        }
+
+        #endregion
+
+        #region cmd: load preset 
+
+        public static void LoadPreset(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        {
+            Send(adapter, MTRFXXCommand.LoadPreset, mode, channel);
+        }
+
+        public static void LoadPreset(this MTRFXXAdapter adapter, UInt32 deviceId)
+        {
+            Send(adapter, MTRFXXCommand.LoadPreset, deviceId);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region led
+
+        #region cmd: set led color
+
+        public static void SetLedColor(this MTRFXXAdapter adapter, CmdMode mode, byte channel, byte valueR, byte valueG, byte valueB)
+        {
+            SendData(adapter, MTRFXXCommand.SetBrightness, mode, channel, MTRFXXDataFormat.LED, valueR, valueG, valueB);
+        }
+
+        public static void SetLedColor(this MTRFXXAdapter adapter, UInt32 deviceId, byte valueR, byte valueG, byte valueB)
+        {
+            SendData(adapter, MTRFXXCommand.SetBrightness, deviceId, MTRFXXDataFormat.LED, valueR, valueG, valueB);
+        }
+
+        #endregion
+        
+        #region cmd: change color
+
+        public static void ChangeLedColor(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        {
+            Send(adapter, MTRFXXCommand.ChangeColor, mode, channel);
+        }
+
+        public static void ChangeLedColor(this MTRFXXAdapter adapter, UInt32 deviceId)
+        {
+            Send(adapter, MTRFXXCommand.ChangeColor, deviceId);
+        }
+
+        #endregion
+        
+        #region cmd: change color mode
+
+        public static void ChangeLedColorMode(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        {
+            Send(adapter, MTRFXXCommand.ChangeColorMode, mode, channel);
+        }
+
+        public static void ChangeLedColorMode(this MTRFXXAdapter adapter, UInt32 deviceId)
+        {
+            Send(adapter, MTRFXXCommand.ChangeColorMode, deviceId);
+        }
+
+        #endregion
+
+        #region cmd: change color speed
+
+        public static void ChangeLedColorSpeed(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        {
+            Send(adapter, MTRFXXCommand.ChangeColorSpeed, mode, channel);
+        }
+
+        public static void ChangeLedColorSpeed(this MTRFXXAdapter adapter, UInt32 deviceId)
+        {
+            Send(adapter, MTRFXXCommand.ChangeColorSpeed, deviceId);
+        }
+
+        #endregion
+        
+
+        #endregion
+        
+        #region binding
+
+        #region cmd: bind
+
+        public static void Bind(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        {
+            Send(adapter, MTRFXXCommand.Bind, mode, channel);
+        }
+
+        public static void Bind(this MTRFXXAdapter adapter, UInt32 deviceId)
+        {
+            Send(adapter, MTRFXXCommand.Bind, deviceId);
+        }
+
+        #endregion
+
+        #region cmd: unbind
+
+        public static void Unbind(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        {
+            Send(adapter, MTRFXXCommand.Unbind, mode, channel);
+        }
+
+        public static void Unbind(this MTRFXXAdapter adapter, UInt32 deviceId)
+        {
+            Send(adapter, MTRFXXCommand.Unbind, deviceId);
+        }
+
+        #endregion
+        
+        #endregion
+
         // binding rx
         public static void BindStart(this MTRFXXAdapter adapter, byte channel)
         {

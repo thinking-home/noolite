@@ -26,10 +26,10 @@ namespace ThinkingHome.NooLite.DebugConsole
 
                 Console.ReadKey();
 
-                Console.WriteLine("bind");
-                adapter.Bind(13);
-
-                Console.ReadKey();
+//                Console.WriteLine("bind");
+//                adapter.Bind(13);
+//
+//                Console.ReadKey();
                 
                 
 //                Console.WriteLine("unbind");
@@ -38,22 +38,22 @@ namespace ThinkingHome.NooLite.DebugConsole
 //                Console.ReadKey();
 
                 Console.WriteLine("on");
-                adapter.On(13);
+                adapter.On(1594);
 
                 Console.ReadKey();
 
                 Console.WriteLine("off");
-                adapter.Off(13);
+                adapter.Off(CmdMode.NooLiteF, 13);
 
                 Console.ReadKey();
                 
                 Console.WriteLine("on");
-                adapter.On(13);    
+                adapter.On(CmdMode.NooLiteF, 13);    
 
                 Console.ReadKey();
 
                 Console.WriteLine("off");
-                adapter.Off(13);
+                adapter.Off(1594);
 
                 Console.ReadKey();
                 
