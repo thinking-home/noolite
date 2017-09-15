@@ -1,6 +1,6 @@
 ﻿namespace ThinkingHome.NooLite
 {
-    public enum CommandResult
+    public enum ResultCode
     {
         Success = 0,
         

@@ -1,5 +1,5 @@
 using System;
-using ThinkingHome.NooLite.Params;
+using ThinkingHome.NooLite.Internal;
 using Xunit;
 
 namespace ThinkingHome.NooLite.Tests.ReceivedData
@@ -43,7 +43,7 @@ namespace ThinkingHome.NooLite.Tests.ReceivedData
 
             var data = new NooLite.ReceivedData(bytes);
 
-            Assert.Equal(CommandResult.NoResponse, data.Result);
+            Assert.Equal(ResultCode.NoResponse, data.Result);
         }
 
         [Fact]

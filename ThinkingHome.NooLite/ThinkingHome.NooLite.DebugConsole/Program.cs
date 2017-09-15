@@ -43,12 +43,12 @@ namespace ThinkingHome.NooLite.DebugConsole
                 Console.ReadKey();
 
                 Console.WriteLine("off");
-                adapter.Off(CmdMode.NooLiteF, 13);
+                adapter.Off(Mode.NooLiteF, 13);
 
                 Console.ReadKey();
                 
                 Console.WriteLine("on");
-                adapter.On(CmdMode.NooLiteF, 13);    
+                adapter.On(Mode.NooLiteF, 13);    
 
                 Console.ReadKey();
 

@@ -1,23 +1,16 @@
 ﻿using System;
-using ThinkingHome.NooLite.Params;
+using ThinkingHome.NooLite.Internal;
 
 namespace ThinkingHome.NooLite
 {
-    public enum CmdMode
-    {
-        Default,
-        NooLiteF,
-        Broadcast
-    }
-
     public static class MTRFXXAdapterExtensions
     {
         #region private
         
-        private static void Send(MTRFXXAdapter adapter, MTRFXXCommand command, CmdMode mode, byte channel = 0)
+        private static void Send(MTRFXXAdapter adapter, MTRFXXCommand command, Mode mode, byte channel = 0)
         {
-            var _mode = mode == CmdMode.Default ? MTRFXXMode.TX : MTRFXXMode.TXF;
-            var _action = mode == CmdMode.Broadcast ? MTRFXXAction.SendBroadcastCommand : MTRFXXAction.SendCommand;
+            var _mode = mode == Mode.Default ? MTRFXXMode.TX : MTRFXXMode.TXF;
+            var _action = mode == Mode.Broadcast ? MTRFXXAction.SendBroadcastCommand : MTRFXXAction.SendCommand;
 
             adapter.SendCommand(_mode, _action, channel, command);
         }
@@ -30,10 +23,10 @@ namespace ThinkingHome.NooLite
             adapter.SendCommand(_mode, _action, 0, command, target: deviceId);
         }
 
-        private static void SendData(MTRFXXAdapter adapter, MTRFXXCommand command, CmdMode mode, byte channel, MTRFXXDataFormat format, params byte[] data)
+        private static void SendData(MTRFXXAdapter adapter, MTRFXXCommand command, Mode mode, byte channel, MTRFXXDataFormat format, params byte[] data)
         {
-            var _mode = mode == CmdMode.Default ? MTRFXXMode.TX : MTRFXXMode.TXF;
-            var _action = mode == CmdMode.Broadcast ? MTRFXXAction.SendBroadcastCommand : MTRFXXAction.SendCommand;
+            var _mode = mode == Mode.Default ? MTRFXXMode.TX : MTRFXXMode.TXF;
+            var _action = mode == Mode.Broadcast ? MTRFXXAction.SendBroadcastCommand : MTRFXXAction.SendCommand;
             
             adapter.SendCommand(_mode, _action, channel, command, MTRFXXRepeatCount.NoRepeat, format, data);
         }
@@ -52,7 +45,7 @@ namespace ThinkingHome.NooLite
 
         #region cmd: on
 
-        public static void On(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        public static void On(this MTRFXXAdapter adapter, Mode mode, byte channel)
         {
             Send(adapter, MTRFXXCommand.On, mode, channel);
         }
@@ -66,7 +59,7 @@ namespace ThinkingHome.NooLite
         
         #region cmd: off
 
-        public static void Off(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        public static void Off(this MTRFXXAdapter adapter, Mode mode, byte channel)
         {
             Send(adapter, MTRFXXCommand.Off, mode, channel);
         }
@@ -80,7 +73,7 @@ namespace ThinkingHome.NooLite
 
         #region cmd: switch
 
-        public static void Switch(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        public static void Switch(this MTRFXXAdapter adapter, Mode mode, byte channel)
         {
             Send(adapter, MTRFXXCommand.Switch, mode, channel);
         }
@@ -94,7 +87,7 @@ namespace ThinkingHome.NooLite
         
         #region cmd: set brightness
 
-        public static void SetBrightness(this MTRFXXAdapter adapter, CmdMode mode, byte channel, byte brightness)
+        public static void SetBrightness(this MTRFXXAdapter adapter, Mode mode, byte channel, byte brightness)
         {
             SendData(adapter, MTRFXXCommand.SetBrightness, mode, channel, MTRFXXDataFormat.OneByteData, brightness);
         }
@@ -112,7 +105,7 @@ namespace ThinkingHome.NooLite
 
         #region cmd: save preset 
 
-        public static void SavePreset(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        public static void SavePreset(this MTRFXXAdapter adapter, Mode mode, byte channel)
         {
             Send(adapter, MTRFXXCommand.SavePreset, mode, channel);
         }
@@ -126,7 +119,7 @@ namespace ThinkingHome.NooLite
 
         #region cmd: load preset 
 
-        public static void LoadPreset(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        public static void LoadPreset(this MTRFXXAdapter adapter, Mode mode, byte channel)
         {
             Send(adapter, MTRFXXCommand.LoadPreset, mode, channel);
         }
@@ -144,7 +137,7 @@ namespace ThinkingHome.NooLite
 
         #region cmd: set led color
 
-        public static void SetLedColor(this MTRFXXAdapter adapter, CmdMode mode, byte channel, byte valueR, byte valueG, byte valueB)
+        public static void SetLedColor(this MTRFXXAdapter adapter, Mode mode, byte channel, byte valueR, byte valueG, byte valueB)
         {
             SendData(adapter, MTRFXXCommand.SetBrightness, mode, channel, MTRFXXDataFormat.LED, valueR, valueG, valueB);
         }
@@ -158,7 +151,7 @@ namespace ThinkingHome.NooLite
         
         #region cmd: change color
 
-        public static void ChangeLedColor(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        public static void ChangeLedColor(this MTRFXXAdapter adapter, Mode mode, byte channel)
         {
             Send(adapter, MTRFXXCommand.ChangeColor, mode, channel);
         }
@@ -172,7 +165,7 @@ namespace ThinkingHome.NooLite
         
         #region cmd: change color mode
 
-        public static void ChangeLedColorMode(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        public static void ChangeLedColorMode(this MTRFXXAdapter adapter, Mode mode, byte channel)
         {
             Send(adapter, MTRFXXCommand.ChangeColorMode, mode, channel);
         }
@@ -186,7 +179,7 @@ namespace ThinkingHome.NooLite
 
         #region cmd: change color speed
 
-        public static void ChangeLedColorSpeed(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        public static void ChangeLedColorSpeed(this MTRFXXAdapter adapter, Mode mode, byte channel)
         {
             Send(adapter, MTRFXXCommand.ChangeColorSpeed, mode, channel);
         }
@@ -198,14 +191,13 @@ namespace ThinkingHome.NooLite
 
         #endregion
         
-
         #endregion
         
         #region binding
 
         #region cmd: bind
 
-        public static void Bind(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        public static void Bind(this MTRFXXAdapter adapter, Mode mode, byte channel)
         {
             Send(adapter, MTRFXXCommand.Bind, mode, channel);
         }
@@ -219,7 +211,7 @@ namespace ThinkingHome.NooLite
 
         #region cmd: unbind
 
-        public static void Unbind(this MTRFXXAdapter adapter, CmdMode mode, byte channel)
+        public static void Unbind(this MTRFXXAdapter adapter, Mode mode, byte channel)
         {
             Send(adapter, MTRFXXCommand.Unbind, mode, channel);
         }
@@ -233,7 +225,8 @@ namespace ThinkingHome.NooLite
         
         #endregion
 
-        // binding rx
+        #region RX mode
+        
         public static void BindStart(this MTRFXXAdapter adapter, byte channel)
         {
             adapter.SendCommand(MTRFXXMode.RX, MTRFXXAction.StartBinding, channel, MTRFXXCommand.None);
@@ -258,6 +251,8 @@ namespace ThinkingHome.NooLite
         public static void ExitServiceMode(this MTRFXXAdapter adapter)
         {
             adapter.SendCommand(MTRFXXMode.Service, MTRFXXAction.SendCommand, 0, MTRFXXCommand.None);
-        }   
+        }
+        
+        #endregion
     }
 }
