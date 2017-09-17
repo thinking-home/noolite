@@ -135,7 +135,7 @@ void BindStart(byte channel)
 Выйти из режима привязки:
 
 ```csharp
-void BindStop(adapter)
+void BindStop()
 ```
 
 Очистить привязанные передающие устройства в заданном канале:
