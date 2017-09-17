@@ -80,6 +80,11 @@ namespace ThinkingHome.NooLite
             byte id3 = (byte)(target >> 8);
             byte id4 = (byte)target;
 
+            byte d1 = data.Length > 0 ? data[0] : (byte)0;
+            byte d2 = data.Length > 1 ? data[1] : (byte)0;
+            byte d3 = data.Length > 2 ? data[2] : (byte)0;
+            byte d4 = data.Length > 3 ? data[3] : (byte)0;
+            
             var res = new byte[]
             {
                 START_MARKER, // 0: start marker
@@ -89,7 +94,7 @@ namespace ThinkingHome.NooLite
                 channel, // 4: channel
                 (byte) command, // 5: command
                 (byte) format, // 6: data format
-                0, 0, 0, 0, // 7..10: data
+                d1, d2, d3, d4, // 7..10: data
                 id1, id2, id3, id4, // 11..14: target device id
                 0, // 15: checksum
                 STOP_MARKER // 16: stop marker
