@@ -15,7 +15,8 @@ namespace ThinkingHome.NooLite.DebugConsole
 //            }
 //
 //            return;
-            using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AI04XT35"))
+            //using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AI04XT35"))
+            using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI"))
             {
                 adapter.DataReceived += AdapterOnDataReceived;
                 
@@ -26,34 +27,39 @@ namespace ThinkingHome.NooLite.DebugConsole
 
                 Console.ReadKey();
 
+                Console.WriteLine("bind");
+                adapter.Bind(Mode.NooLiteF, 13);
+
+                Console.ReadKey();
+
 //                Console.WriteLine("bind");
-//                adapter.Bind(13);
+//                adapter.Bind(Mode.NooLiteF, 13);
 //
 //                Console.ReadKey();
                 
-                
+//                
 //                Console.WriteLine("unbind");
-//                adapter.UnBind(13);
+//                adapter.Unbind(Mode.NooLiteF, 13);
 //
 //                Console.ReadKey();
 
                 Console.WriteLine("on");
-                adapter.On(1594);
+                adapter.On(Mode.NooLiteF, 13, 1594);
 
                 Console.ReadKey();
 
                 Console.WriteLine("off");
-                adapter.Off(Mode.NooLiteF, 13);
+                adapter.Off(Mode.NooLiteF, 13, 1594);
 
                 Console.ReadKey();
                 
                 Console.WriteLine("on");
-                adapter.On(Mode.NooLiteF, 13);    
+                adapter.On(Mode.NooLiteF, 13, 2405);    
 
                 Console.ReadKey();
 
                 Console.WriteLine("off");
-                adapter.Off(1594);
+                adapter.Off(Mode.NooLiteF, 13, 2405);
 
                 Console.ReadKey();
                 

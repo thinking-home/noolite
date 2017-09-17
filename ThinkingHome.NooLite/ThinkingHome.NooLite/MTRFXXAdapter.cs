@@ -75,6 +75,10 @@ namespace ThinkingHome.NooLite
             MTRFXXCommand command, MTRFXXDataFormat format, byte[] data, UInt32 target = 0)
         {
             byte actionAndRepeatCount = (byte) ((byte) action | ((byte) repeatCount << 6));
+            byte id1 = (byte)(target >> 24);
+            byte id2 = (byte)(target >> 16);
+            byte id3 = (byte)(target >> 8);
+            byte id4 = (byte)target;
 
             var res = new byte[]
             {
@@ -86,7 +90,7 @@ namespace ThinkingHome.NooLite
                 (byte) command, // 5: command
                 (byte) format, // 6: data format
                 0, 0, 0, 0, // 7..10: data
-                0, 0, 0, 0, // 11..14: target device id
+                id1, id2, id3, id4, // 11..14: target device id
                 0, // 15: checksum
                 STOP_MARKER // 16: stop marker
             };
