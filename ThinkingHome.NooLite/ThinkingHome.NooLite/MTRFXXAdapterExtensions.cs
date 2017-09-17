@@ -82,14 +82,26 @@ namespace ThinkingHome.NooLite
 
         #region cmd: temporary switch on
 
-        public static void TemporarySwitchOn(this MTRFXXAdapter adapter, byte channel)
+        public static void TemporarySwitchOn(this MTRFXXAdapter adapter, byte channel, UInt16 interval)
         {
-            Send(adapter, MTRFXXCommand.TemporarySwitchOn, false, channel);
+            byte b1 = (byte)interval;
+            byte b2 = (byte)(interval >> 8);
+            var format = b2 == 0
+                ? MTRFXXDataFormat.TemporarySwitchOnOneByte
+                : MTRFXXDataFormat.TemporarySwitchOnTwoBytes;
+            
+            SendData(adapter, MTRFXXCommand.TemporarySwitchOn, false, channel, null, format, b1, b2);
         }
 
-        public static void TemporarySwitchOnF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
+        public static void TemporarySwitchOnF(this MTRFXXAdapter adapter, byte channel, UInt16 interval, UInt32? deviceId = null)
         {
-            Send(adapter, MTRFXXCommand.TemporarySwitchOn, true, channel, deviceId);
+            byte b1 = (byte)interval;
+            byte b2 = (byte)(interval >> 8);
+            var format = b2 == 0
+                ? MTRFXXDataFormat.TemporarySwitchOnOneByte
+                : MTRFXXDataFormat.TemporarySwitchOnTwoBytes;
+            
+            SendData(adapter, MTRFXXCommand.TemporarySwitchOn, true, channel, deviceId, format, b1, b2);
         }
 
         #endregion

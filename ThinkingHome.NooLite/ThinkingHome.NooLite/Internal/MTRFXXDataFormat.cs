@@ -8,6 +8,10 @@
         
         FourByteData = 0x03,
         
-        LED = 0x04
+        LED = 0x04,
+        
+        TemporarySwitchOnOneByte = 0x05,
+        
+        TemporarySwitchOnTwoBytes = 0x06
     }
 }
