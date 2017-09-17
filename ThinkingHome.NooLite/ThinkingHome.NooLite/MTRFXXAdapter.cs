@@ -45,8 +45,8 @@ namespace ThinkingHome.NooLite
 
         public void Dispose()
         {
-            device.Dispose();
             timer.Dispose();
+            device.Dispose();
         }
 
         #endregion
