@@ -40,45 +40,70 @@ namespace ThinkingHome.NooLite
 
         #region cmd: on
 
-        public static void On(this MTRFXXAdapter adapter, bool useFMode, byte channel, UInt32? deviceId = null)
+        public static void On(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.On, useFMode, channel, deviceId);
+            Send(adapter, MTRFXXCommand.On, false, channel);
+        }
+
+        public static void OnF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
+        {
+            Send(adapter, MTRFXXCommand.On, true, channel, deviceId);
         }
 
         #endregion
         
         #region cmd: off
 
-        public static void Off(this MTRFXXAdapter adapter, bool useFMode, byte channel, UInt32? deviceId = null)
+        public static void Off(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.Off, useFMode, channel, deviceId);
+            Send(adapter, MTRFXXCommand.Off, false, channel);
+        }
+
+        public static void OffF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
+        {
+            Send(adapter, MTRFXXCommand.Off, true, channel, deviceId);
         }
 
         #endregion
 
         #region cmd: switch
 
-        public static void Switch(this MTRFXXAdapter adapter, bool useFMode, byte channel, UInt32? deviceId = null)
+        public static void Switch(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.Switch, useFMode, channel, deviceId);
+            Send(adapter, MTRFXXCommand.Switch, false, channel);
+        }
+
+        public static void SwitchF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
+        {
+            Send(adapter, MTRFXXCommand.Switch, true, channel, deviceId);
         }
 
         #endregion
 
         #region cmd: temporary switch on
 
-        public static void TemporarySwitchOn(this MTRFXXAdapter adapter, bool useFMode, byte channel, UInt32? deviceId = null)
+        public static void TemporarySwitchOn(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.TemporarySwitchOn, useFMode, channel, deviceId);
+            Send(adapter, MTRFXXCommand.TemporarySwitchOn, false, channel);
+        }
+
+        public static void TemporarySwitchOnF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
+        {
+            Send(adapter, MTRFXXCommand.TemporarySwitchOn, true, channel, deviceId);
         }
 
         #endregion
         
         #region cmd: set brightness
 
-        public static void SetBrightness(this MTRFXXAdapter adapter, bool useFMode, byte channel, byte brightness, UInt32? deviceId = null)
+        public static void SetBrightness(this MTRFXXAdapter adapter, byte channel, byte brightness)
         {
-            SendData(adapter, MTRFXXCommand.SetBrightness, useFMode, channel, deviceId, MTRFXXDataFormat.OneByteData, brightness);
+            SendData(adapter, MTRFXXCommand.SetBrightness, false, channel, null, MTRFXXDataFormat.OneByteData, brightness);
+        }
+
+        public static void SetBrightnessF(this MTRFXXAdapter adapter, byte channel, byte brightness, UInt32? deviceId = null)
+        {
+            SendData(adapter, MTRFXXCommand.SetBrightness, true, channel, deviceId, MTRFXXDataFormat.OneByteData, brightness);
         }
 
         #endregion
@@ -89,18 +114,28 @@ namespace ThinkingHome.NooLite
 
         #region cmd: save preset 
 
-        public static void SavePreset(this MTRFXXAdapter adapter, bool useFMode, byte channel, UInt32? deviceId = null)
+        public static void SavePreset(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.SavePreset, useFMode, channel, deviceId);
+            Send(adapter, MTRFXXCommand.SavePreset, false, channel);
+        }
+
+        public static void SavePresetF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
+        {
+            Send(adapter, MTRFXXCommand.SavePreset, true, channel, deviceId);
         }
 
         #endregion
 
         #region cmd: load preset 
 
-        public static void LoadPreset(this MTRFXXAdapter adapter, bool useFMode, byte channel, UInt32? deviceId = null)
+        public static void LoadPreset(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.LoadPreset, useFMode, channel, deviceId);
+            Send(adapter, MTRFXXCommand.LoadPreset, false, channel);
+        }
+
+        public static void LoadPresetF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
+        {
+            Send(adapter, MTRFXXCommand.LoadPreset, true, channel, deviceId);
         }
 
         #endregion
@@ -111,36 +146,56 @@ namespace ThinkingHome.NooLite
 
         #region cmd: set led color
 
-        public static void SetLedColor(this MTRFXXAdapter adapter, bool useFMode, byte channel, byte valueR, byte valueG, byte valueB, UInt32? deviceId = null)
+        public static void SetLedColor(this MTRFXXAdapter adapter, byte channel, byte valueR, byte valueG, byte valueB)
         {
-            SendData(adapter, MTRFXXCommand.SetBrightness, useFMode, channel, deviceId, MTRFXXDataFormat.LED, valueR, valueG, valueB);
+            SendData(adapter, MTRFXXCommand.SetBrightness, false, channel, null, MTRFXXDataFormat.LED, valueR, valueG, valueB);
+        }
+
+        public static void SetLedColorF(this MTRFXXAdapter adapter, byte channel, byte valueR, byte valueG, byte valueB, UInt32? deviceId = null)
+        {
+            SendData(adapter, MTRFXXCommand.SetBrightness, true, channel, deviceId, MTRFXXDataFormat.LED, valueR, valueG, valueB);
         }
 
         #endregion
         
         #region cmd: change color
 
-        public static void ChangeLedColor(this MTRFXXAdapter adapter, bool useFMode, byte channel, UInt32? deviceId = null)
+        public static void ChangeLedColor(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.ChangeColor, useFMode, channel, deviceId);
+            Send(adapter, MTRFXXCommand.ChangeColor, false, channel);
+        }
+
+        public static void ChangeLedColorF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
+        {
+            Send(adapter, MTRFXXCommand.ChangeColor, true, channel, deviceId);
         }
 
         #endregion
         
         #region cmd: change color mode
 
-        public static void ChangeLedColorMode(this MTRFXXAdapter adapter, bool useFMode, byte channel, UInt32? deviceId = null)
+        public static void ChangeLedColorMode(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.ChangeColorMode, useFMode, channel, deviceId);
+            Send(adapter, MTRFXXCommand.ChangeColorMode, false, channel);
+        }
+
+        public static void ChangeLedColorModeF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
+        {
+            Send(adapter, MTRFXXCommand.ChangeColorMode, true, channel, deviceId);
         }
 
         #endregion
 
         #region cmd: change color speed
 
-        public static void ChangeLedColorSpeed(this MTRFXXAdapter adapter, bool useFMode, byte channel, UInt32? deviceId = null)
+        public static void ChangeLedColorSpeed(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.ChangeColorSpeed, useFMode, channel, deviceId);
+            Send(adapter, MTRFXXCommand.ChangeColorSpeed, false, channel);
+        }
+
+        public static void ChangeLedColorSpeedF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
+        {
+            Send(adapter, MTRFXXCommand.ChangeColorSpeed, true, channel, deviceId);
         }
 
         #endregion
@@ -151,18 +206,28 @@ namespace ThinkingHome.NooLite
 
         #region cmd: bind
 
-        public static void Bind(this MTRFXXAdapter adapter, bool useFMode, byte channel, UInt32? deviceId = null)
+        public static void Bind(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.Bind, useFMode, channel, deviceId);
+            Send(adapter, MTRFXXCommand.Bind, false, channel);
+        }
+
+        public static void BindF(this MTRFXXAdapter adapter, byte channel)
+        {
+            Send(adapter, MTRFXXCommand.Bind, true, channel);
         }
 
         #endregion
 
         #region cmd: unbind
 
-        public static void Unbind(this MTRFXXAdapter adapter, bool useFMode, byte channel, UInt32? deviceId = null)
+        public static void Unbind(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.Unbind, useFMode, channel, deviceId);
+            Send(adapter, MTRFXXCommand.Unbind, false, channel);
+        }
+
+        public static void UnbindF(this MTRFXXAdapter adapter, byte channel)
+        {
+            Send(adapter, MTRFXXCommand.Unbind, true, channel);
         }
 
         #endregion

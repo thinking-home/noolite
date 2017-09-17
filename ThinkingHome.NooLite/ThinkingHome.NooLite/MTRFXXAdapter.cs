@@ -80,10 +80,12 @@ namespace ThinkingHome.NooLite
             byte id3 = (byte)(target >> 8);
             byte id4 = (byte)target;
 
-            byte d1 = data.Length > 0 ? data[0] : (byte)0;
-            byte d2 = data.Length > 1 ? data[1] : (byte)0;
-            byte d3 = data.Length > 2 ? data[2] : (byte)0;
-            byte d4 = data.Length > 3 ? data[3] : (byte)0;
+            byte[] d = data ?? new byte[0];
+            
+            byte d1 = d.Length > 0 ? d[0] : (byte)0;
+            byte d2 = d.Length > 1 ? d[1] : (byte)0;  
+            byte d3 = d.Length > 2 ? d[2] : (byte)0;
+            byte d4 = d.Length > 3 ? d[3] : (byte)0;
             
             var res = new byte[]
             {
