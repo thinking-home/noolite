@@ -15,8 +15,8 @@ namespace ThinkingHome.NooLite.DebugConsole
 //            }
 //
 //            return;
-            //using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AI04XT35"))
-            using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI"))
+            using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AI04XT35"))
+                //using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI"))
             {
                 adapter.DataReceived += AdapterOnDataReceived;
                 

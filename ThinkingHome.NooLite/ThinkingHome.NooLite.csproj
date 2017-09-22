@@ -20,7 +20,4 @@
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
     <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0-beta2" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Params" />
-  </ItemGroup>
 </Project>

@@ -29,8 +29,13 @@ namespace ThinkingHome.NooLite
 
                 while (device.BytesToRead >= BUFFER_SIZE)
                 {
-                    device.Read(bytes, 0, BUFFER_SIZE);
-                    DataReceived?.Invoke(this, ReceivedData.Parse(bytes));
+                    if (device.ReadByte() == ReceivedData.START_MARKER)
+                    {
+                        bytes[0] = ReceivedData.START_MARKER;
+                        device.Read(bytes, 1, BUFFER_SIZE - 1);
+                        
+                        DataReceived?.Invoke(this, ReceivedData.Parse(bytes));
+                    }
                 }
             }
         }

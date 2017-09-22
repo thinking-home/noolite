@@ -8,9 +8,9 @@ namespace ThinkingHome.NooLite
     {
         #region static
 
-        private const byte START_MARKER = 173;
+        public const byte START_MARKER = 173;
         
-        private const byte STOP_MARKER = 174;
+        public const byte STOP_MARKER = 174;
 
         private const int BUFFER_SIZE = 17;
 
