@@ -20,13 +20,27 @@ namespace ThinkingHome.NooLite.DebugConsole
             {
                 adapter.DataReceived += AdapterOnDataReceived;
                 
+                Console.WriteLine("open");
                 adapter.Open();
+                Console.ReadKey();
 
                 Console.WriteLine("exit service mode");
                 adapter.ExitServiceMode();
-
                 Console.ReadKey();
 
+                Console.WriteLine("close");
+                adapter.Close();
+                Console.ReadKey();
+
+                Console.WriteLine("open");
+                adapter.Open();
+                Console.ReadKey();
+
+                Console.WriteLine("exit service mode");
+                adapter.ExitServiceMode();
+                Console.ReadKey();
+
+                
 //                Console.WriteLine("bind");
 //                adapter.BindF(13);
 //

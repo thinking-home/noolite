@@ -9,6 +9,8 @@ namespace ThinkingHome.NooLite
     {
         #region common
 
+        private readonly object lockObject = new object();
+        
         private const int READING_INTERVAL = 50;
         private const int BUFFER_SIZE = 17;
         
@@ -23,35 +25,62 @@ namespace ThinkingHome.NooLite
 
         private void TimerCallback(object state)
         {
-            lock (device)
+            lock (lockObject)
             {
-                var bytes = new byte[BUFFER_SIZE];
-
-                while (device.BytesToRead >= BUFFER_SIZE)
+                if (device.IsOpen)
                 {
-                    if (device.ReadByte() == ReceivedData.START_MARKER)
+                    var bytes = new byte[BUFFER_SIZE];
+
+                    while (device.BytesToRead >= BUFFER_SIZE)
                     {
-                        bytes[0] = ReceivedData.START_MARKER;
-                        device.Read(bytes, 1, BUFFER_SIZE - 1);
+                        if (device.ReadByte() == ReceivedData.START_MARKER)
+                        {
+                            bytes[0] = ReceivedData.START_MARKER;
+                            device.Read(bytes, 1, BUFFER_SIZE - 1);
                         
-                        DataReceived?.Invoke(this, ReceivedData.Parse(bytes));
+                            DataReceived?.Invoke(this, ReceivedData.Parse(bytes));
+                        }
                     }
                 }
             }
         }
 
+        public bool IsOpened => device.IsOpen;
+
         public void Open()
         {
-            device.Open();
-            timer.Change(0, READING_INTERVAL);
+            if (!device.IsOpen)
+            {
+                lock (lockObject)
+                {
+                    if (!device.IsOpen)
+                    {
+                        device.Open();
+                        timer.Change(0, READING_INTERVAL);
+                    }
+                }
+            }
         }
 
-        public bool IsOpened => device.IsOpen;
+        public void Close()
+        {
+            if (device.IsOpen)
+            {
+                lock (lockObject)
+                {
+                    if (device.IsOpen)
+                    {
+                        timer.Change(Timeout.Infinite, READING_INTERVAL);
+                        device.Dispose();
+                    }
+                }
+            }
+        }
 
         public void Dispose()
         {
+            Close();
             timer.Dispose();
-            device.Dispose();
         }
 
         #endregion
