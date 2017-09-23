@@ -7,6 +7,14 @@ namespace ThinkingHome.NooLite
 {
     public class MTRFXXAdapter : IDisposable
     {
+        #region events
+        
+        public event Action<object, ReceivedData> DataReceived;
+        public event Action<object> Connected;
+        public event Action<object> Disconnected;
+        
+        #endregion
+        
         #region common
 
         private readonly object lockObject = new object();
@@ -71,6 +79,7 @@ namespace ThinkingHome.NooLite
             {
                 device.Open();
                 timer.Change(0, READING_INTERVAL);
+                Connected?.Invoke(this);
             });
         }
 
@@ -80,6 +89,7 @@ namespace ThinkingHome.NooLite
             {
                 timer.Change(Timeout.Infinite, READING_INTERVAL);
                 device.Close();
+                Disconnected?.Invoke(this);
             });
         }
 
@@ -90,10 +100,8 @@ namespace ThinkingHome.NooLite
         }
 
         #endregion
-
+        
         #region commands
-
-        public event Action<object, ReceivedData> DataReceived;
 
         public void SendCommand(MTRFXXMode mode, MTRFXXAction action, byte channel, MTRFXXCommand command,
             MTRFXXRepeatCount repeatCount = MTRFXXRepeatCount.NoRepeat, MTRFXXDataFormat format = MTRFXXDataFormat.NoData,
@@ -107,9 +115,9 @@ namespace ThinkingHome.NooLite
 
         #region commands: static
 
-        private const byte START_MARKER = 171;
+        public const byte START_MARKER = 171;
         
-        private const byte STOP_MARKER = 172;
+        public const byte STOP_MARKER = 172;
 
         public static byte[] BuildCommand(MTRFXXMode mode, MTRFXXAction action, MTRFXXRepeatCount repeatCount, byte channel,
             MTRFXXCommand command, MTRFXXDataFormat format, byte[] data, UInt32 target = 0)

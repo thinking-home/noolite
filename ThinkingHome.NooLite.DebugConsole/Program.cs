@@ -19,6 +19,8 @@ namespace ThinkingHome.NooLite.DebugConsole
             using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI"))
             {
                 adapter.DataReceived += AdapterOnDataReceived;
+                adapter.Connected += AdapterOnConnected;
+                adapter.Disconnected += AdapterOnDisconnected;
                 
                 Console.WriteLine("open");
                 adapter.Open();
@@ -86,6 +88,16 @@ namespace ThinkingHome.NooLite.DebugConsole
 //                Console.WriteLine("bind: stop");
 //                adapter.BindStop();
             }
+        }
+
+        private static void AdapterOnDisconnected(object o)
+        {
+            Console.WriteLine("disconnect");
+        }
+
+        private static void AdapterOnConnected(object o)
+        {
+            Console.WriteLine("connect");
         }
 
         private static void AdapterOnDataReceived(object o, ReceivedData result)
