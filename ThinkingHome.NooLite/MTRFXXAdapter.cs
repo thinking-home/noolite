@@ -17,6 +17,20 @@ namespace ThinkingHome.NooLite
         private readonly SerialPort device;
         private readonly Timer timer;
 
+        private void ThreadSafeExec(bool isOpen, Action fn)
+        {
+            if (device.IsOpen == isOpen)
+            {
+                lock (lockObject)
+                {
+                    if (device.IsOpen == isOpen)
+                    {
+                        fn();
+                    }
+                }
+            }
+        }
+
         public MTRFXXAdapter(string portName)
         {
             device = new SerialPort(portName, 9600);
@@ -25,9 +39,9 @@ namespace ThinkingHome.NooLite
 
         private void TimerCallback(object state)
         {
-            lock (lockObject)
+            ThreadSafeExec(true, () =>
             {
-                if (device.IsOpen)
+                try
                 {
                     var bytes = new byte[BUFFER_SIZE];
 
@@ -42,39 +56,31 @@ namespace ThinkingHome.NooLite
                         }
                     }
                 }
-            }
+                catch
+                {
+                    Close();
+                }
+            });
         }
 
         public bool IsOpened => device.IsOpen;
 
         public void Open()
         {
-            if (!device.IsOpen)
+            ThreadSafeExec(false, () =>
             {
-                lock (lockObject)
-                {
-                    if (!device.IsOpen)
-                    {
-                        device.Open();
-                        timer.Change(0, READING_INTERVAL);
-                    }
-                }
-            }
+                device.Open();
+                timer.Change(0, READING_INTERVAL);
+            });
         }
 
         public void Close()
         {
-            if (device.IsOpen)
+            ThreadSafeExec(true, () =>
             {
-                lock (lockObject)
-                {
-                    if (device.IsOpen)
-                    {
-                        timer.Change(Timeout.Infinite, READING_INTERVAL);
-                        device.Dispose();
-                    }
-                }
-            }
+                timer.Change(Timeout.Infinite, READING_INTERVAL);
+                device.Close();
+            });
         }
 
         public void Dispose()
