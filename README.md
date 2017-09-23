@@ -22,21 +22,45 @@ dotnet add package ThinkingHome.NooLite --version 4.0.0-beta1
 using ThinkingHome.NooLite;
 
 ...
-// параметр конструктора - имя COM порта адаптера
-// при использовании в Windows имя будет похоже на "COM4"
-using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI"))
+
+static void Main(string[] args)
 {
-    // добавляем обработчик входящих команд
-    adapter.DataReceived += AdapterOnDataReceived;
+    // параметр конструктора - имя COM порта адаптера
+    // при использовании в Windows имя будет похоже на "COM4"
+    using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI"))
+    {
+        // добавляем действия при подключени к адаптеру и при отключении  
+        adapter.Connected += AdapterOnConnected;
+        adapter.Disconnected += AdapterOnDisconnected;
 
-    // открываем соединение
-    adapter.Open();
+        // добавляем обработчик входящих команд
+        adapter.DataReceived += AdapterOnDataReceived;
+    
+        // открываем соединение
+        adapter.Open();
+    
+        // досрочный выход из сервисного режима
+        adapter.ExitServiceMode();
+    
+        // включение света в 13 канале (nooLite-F)
+        adapter.OnF(13);
+    }
+}
 
-    // досрочный выход из сервисного режима
-    adapter.ExitServiceMode();
+private static void AdapterOnConnected(object o)
+{
+    Console.WriteLine("connected");
+}
 
-    // включение света в 13 канале (nooLite-F)
-    adapter.OnF(13);
+private static void AdapterOnDisconnected(object o)
+{
+    Console.WriteLine("disconnected");
+}
+
+private static void AdapterOnDataReceived(object o, ReceivedData result)
+{
+    //var msg = string.Join("=", bytes.Select(b => b.ToString()));
+    Console.WriteLine(result);
 }
 ```
 
