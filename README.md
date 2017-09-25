@@ -30,11 +30,14 @@ static void Main(string[] args)
     using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI"))
     {
         // добавляем действия при подключени к адаптеру и при отключении  
-        adapter.Connected += AdapterOnConnected;
-        adapter.Disconnected += AdapterOnDisconnected;
+        adapter.Connect += AdapterOnConnect;
+        adapter.Disconnect += AdapterOnDisconnect;
 
         // добавляем обработчик входящих команд
-        adapter.DataReceived += AdapterOnDataReceived;
+        adapter.ReceiveData += AdapterOnReceiveData;
+        
+        // обработка ошибок
+        adapter.Error += AdapterOnError;
     
         // открываем соединение
         adapter.Open();
@@ -47,20 +50,24 @@ static void Main(string[] args)
     }
 }
 
-private static void AdapterOnConnected(object o)
+private static void AdapterOnConnect(object obj)
 {
-    Console.WriteLine("connected");
+    Console.WriteLine("connect");
 }
 
-private static void AdapterOnDisconnected(object o)
+private static void AdapterOnDisconnect(object obj)
 {
-    Console.WriteLine("disconnected");
+    Console.WriteLine("disconnect");
 }
 
-private static void AdapterOnDataReceived(object o, ReceivedData result)
+private static void AdapterOnReceiveData(object obj, ReceivedData result)
 {
-    //var msg = string.Join("=", bytes.Select(b => b.ToString()));
     Console.WriteLine(result);
+}
+
+private static void AdapterOnError(object obj, Exception ex)
+{
+    Console.WriteLine(ex.Message);
 }
 ```
 

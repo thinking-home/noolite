@@ -9,9 +9,10 @@ namespace ThinkingHome.NooLite
     {
         #region events
         
-        public event Action<object, ReceivedData> DataReceived;
-        public event Action<object> Connected;
-        public event Action<object> Disconnected;
+        public event Action<object, ReceivedData> ReceiveData;
+        public event Action<object> Connect;
+        public event Action<object> Disconnect;
+        public event Action<object, Exception> Error;
         
         #endregion
         
@@ -25,7 +26,7 @@ namespace ThinkingHome.NooLite
         private readonly SerialPort device;
         private readonly Timer timer;
 
-        private void ThreadSafeExec(bool isOpen, Action fn)
+        private void ThreadSafeExec(bool isOpen, Action fn, Action errorHandler = null)
         {
             if (device.IsOpen == isOpen)
             {
@@ -33,7 +34,15 @@ namespace ThinkingHome.NooLite
                 {
                     if (device.IsOpen == isOpen)
                     {
-                        fn();
+                        try
+                        {
+                            fn();
+                        }
+                        catch (Exception ex)
+                        {
+                            errorHandler?.Invoke();
+                            Error?.Invoke(this, ex);
+                        }
                     }
                 }
             }
@@ -47,28 +56,23 @@ namespace ThinkingHome.NooLite
 
         private void TimerCallback(object state)
         {
-            ThreadSafeExec(true, () =>
+            void TryRead()
             {
-                try
-                {
-                    var bytes = new byte[BUFFER_SIZE];
+                var bytes = new byte[BUFFER_SIZE];
 
-                    while (device.BytesToRead >= BUFFER_SIZE)
+                while (device.BytesToRead >= BUFFER_SIZE)
+                {
+                    if (device.ReadByte() == ReceivedData.START_MARKER)
                     {
-                        if (device.ReadByte() == ReceivedData.START_MARKER)
-                        {
-                            bytes[0] = ReceivedData.START_MARKER;
-                            device.Read(bytes, 1, BUFFER_SIZE - 1);
-                        
-                            DataReceived?.Invoke(this, ReceivedData.Parse(bytes));
-                        }
+                        bytes[0] = ReceivedData.START_MARKER;
+                        device.Read(bytes, 1, BUFFER_SIZE - 1);
+
+                        ReceiveData?.Invoke(this, ReceivedData.Parse(bytes));
                     }
                 }
-                catch
-                {
-                    Close();
-                }
-            });
+            }
+
+            ThreadSafeExec(true, TryRead, Close);
         }
 
         public bool IsOpened => device.IsOpen;
@@ -79,7 +83,7 @@ namespace ThinkingHome.NooLite
             {
                 device.Open();
                 timer.Change(0, READING_INTERVAL);
-                Connected?.Invoke(this);
+                Connect?.Invoke(this);
             });
         }
 
@@ -89,7 +93,7 @@ namespace ThinkingHome.NooLite
             {
                 timer.Change(Timeout.Infinite, READING_INTERVAL);
                 device.Close();
-                Disconnected?.Invoke(this);
+                Disconnect?.Invoke(this);
             });
         }
 

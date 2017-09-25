@@ -18,9 +18,11 @@ namespace ThinkingHome.NooLite.DebugConsole
             //using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AI04XT35"))
             using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI"))
             {
-                adapter.DataReceived += AdapterOnDataReceived;
-                adapter.Connected += AdapterOnConnected;
-                adapter.Disconnected += AdapterOnDisconnected;
+                adapter.ReceiveData += AdapterOnReceiveData;
+                adapter.Connect += AdapterOnConnect;
+                adapter.Disconnect += AdapterOnDisconnect;
+                
+                adapter.Error += AdapterOnError;
                 
                 Console.WriteLine("open");
                 adapter.Open();
@@ -90,17 +92,22 @@ namespace ThinkingHome.NooLite.DebugConsole
             }
         }
 
-        private static void AdapterOnDisconnected(object o)
+        private static void AdapterOnError(object obj, Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+
+        private static void AdapterOnDisconnect(object obj)
         {
             Console.WriteLine("disconnect");
         }
 
-        private static void AdapterOnConnected(object o)
+        private static void AdapterOnConnect(object obj)
         {
             Console.WriteLine("connect");
         }
 
-        private static void AdapterOnDataReceived(object o, ReceivedData result)
+        private static void AdapterOnReceiveData(object obj, ReceivedData result)
         {
             //var msg = string.Join("=", bytes.Select(b => b.ToString()));
             Console.WriteLine(result);
