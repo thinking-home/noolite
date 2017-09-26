@@ -7,13 +7,13 @@
 Package Manager
 
 ```
-Install-Package ThinkingHome.NooLite -Version 4.0.0-beta1
+Install-Package ThinkingHome.NooLite -Version 4.0.0-rc-1
 ```
 
 .NET CLI
 
 ```
-dotnet add package ThinkingHome.NooLite --version 4.0.0-beta1
+dotnet add package ThinkingHome.NooLite --version 4.0.0-rc-1
 ```
 
 ## Пример использования
