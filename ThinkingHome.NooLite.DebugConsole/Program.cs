@@ -18,9 +18,11 @@ namespace ThinkingHome.NooLite.DebugConsole
             //using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AI04XT35"))
             using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI"))
             {
-                adapter.ReceiveData += AdapterOnReceiveData;
                 adapter.Connect += AdapterOnConnect;
                 adapter.Disconnect += AdapterOnDisconnect;
+                
+                adapter.ReceiveData += AdapterOnReceiveData;
+                adapter.ReceiveMicroclimateData += AdapterOnReceiveMicroclimateData;
                 
                 adapter.Error += AdapterOnError;
                 
@@ -90,6 +92,11 @@ namespace ThinkingHome.NooLite.DebugConsole
 //                Console.WriteLine("bind: stop");
 //                adapter.BindStop();
             }
+        }
+
+        private static void AdapterOnReceiveMicroclimateData(object o, ReceivedMicroclimateData result)
+        {
+            Console.WriteLine($"temperature: {result.Temperature}, humidity: {result.Humidity}");
         }
 
         private static void AdapterOnError(object obj, Exception ex)

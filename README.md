@@ -33,8 +33,9 @@ static void Main(string[] args)
         adapter.Connect += AdapterOnConnect;
         adapter.Disconnect += AdapterOnDisconnect;
 
-        // добавляем обработчик входящих команд
+        // добавляем обработчики входящих команд
         adapter.ReceiveData += AdapterOnReceiveData;
+        adapter.ReceiveMicroclimateData += AdapterOnReceiveMicroclimateData;
         
         // обработка ошибок
         adapter.Error += AdapterOnError;
@@ -63,6 +64,11 @@ private static void AdapterOnDisconnect(object obj)
 private static void AdapterOnReceiveData(object obj, ReceivedData result)
 {
     Console.WriteLine(result);
+}
+
+private static void AdapterOnReceiveMicroclimateData(object obj, ReceivedMicroclimateData result)
+{
+    Console.WriteLine($"temperature: {result.Temperature}, humidity: {result.Humidity}");
 }
 
 private static void AdapterOnError(object obj, Exception ex)

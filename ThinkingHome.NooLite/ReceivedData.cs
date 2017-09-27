@@ -63,10 +63,8 @@ namespace ThinkingHome.NooLite
 
         public override string ToString()
         {
-            return $"{{ " +
-                   $"mode: {Mode}, command: {Command}, result: {Result}, channel: {Channel}, remains: {Remains} " +
-                   $"fmt: {DataFormat}, data: [{Data1}, {Data2}, {Data3}, {Data4}], device ID: {DeviceId} " +
-                   $"}}";
+            return $"mode: {Mode}, command: {Command}, result: {Result}, channel: {Channel}, remains: {Remains} " +
+                   $"fmt: {DataFormat}, data: [{Data1}, {Data2}, {Data3}, {Data4}], device ID: {DeviceId}";
         }
 
         public static ReceivedData Parse(byte[] data)

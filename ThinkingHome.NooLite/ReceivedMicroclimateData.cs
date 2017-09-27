@@ -21,5 +21,10 @@
 
             return ((decimal)value) / 10;
         }
+
+        public override string ToString()
+        {
+            return base.ToString() + $", temperature: {Temperature}, humidity: {Humidity}";
+        }
     }
 }
