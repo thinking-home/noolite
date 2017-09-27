@@ -160,12 +160,12 @@ namespace ThinkingHome.NooLite
 
         public static void SetLedColor(this MTRFXXAdapter adapter, byte channel, byte valueR, byte valueG, byte valueB)
         {
-            SendData(adapter, MTRFXXCommand.SetBrightness, false, channel, null, MTRFXXDataFormat.LED, valueR, valueG, valueB);
+            SendData(adapter, MTRFXXCommand.SetBrightness, false, channel, null, MTRFXXDataFormat.FourByteData, valueR, valueG, valueB);
         }
 
         public static void SetLedColorF(this MTRFXXAdapter adapter, byte channel, byte valueR, byte valueG, byte valueB, UInt32? deviceId = null)
         {
-            SendData(adapter, MTRFXXCommand.SetBrightness, true, channel, deviceId, MTRFXXDataFormat.LED, valueR, valueG, valueB);
+            SendData(adapter, MTRFXXCommand.SetBrightness, true, channel, deviceId, MTRFXXDataFormat.FourByteData, valueR, valueG, valueB);
         }
 
         #endregion
@@ -174,12 +174,12 @@ namespace ThinkingHome.NooLite
 
         public static void ChangeLedColor(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.ChangeColor, false, channel);
+            SendData(adapter, MTRFXXCommand.ChangeColor, false, channel, null, MTRFXXDataFormat.LED);
         }
 
         public static void ChangeLedColorF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
         {
-            Send(adapter, MTRFXXCommand.ChangeColor, true, channel, deviceId);
+            SendData(adapter, MTRFXXCommand.ChangeColor, true, channel, deviceId, MTRFXXDataFormat.LED);
         }
 
         #endregion
@@ -188,12 +188,12 @@ namespace ThinkingHome.NooLite
 
         public static void ChangeLedColorMode(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.ChangeColorMode, false, channel);
+            SendData(adapter, MTRFXXCommand.ChangeColorMode, false, channel, null, MTRFXXDataFormat.LED);
         }
 
         public static void ChangeLedColorModeF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
         {
-            Send(adapter, MTRFXXCommand.ChangeColorMode, true, channel, deviceId);
+            SendData(adapter, MTRFXXCommand.ChangeColorMode, true, channel, deviceId, MTRFXXDataFormat.LED);
         }
 
         #endregion
@@ -202,12 +202,12 @@ namespace ThinkingHome.NooLite
 
         public static void ChangeLedColorSpeed(this MTRFXXAdapter adapter, byte channel)
         {
-            Send(adapter, MTRFXXCommand.ChangeColorSpeed, false, channel);
+            SendData(adapter, MTRFXXCommand.ChangeColorSpeed, false, channel, null, MTRFXXDataFormat.LED);
         }
 
         public static void ChangeLedColorSpeedF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
         {
-            Send(adapter, MTRFXXCommand.ChangeColorSpeed, true, channel, deviceId);
+            SendData(adapter, MTRFXXCommand.ChangeColorSpeed, true, channel, deviceId, MTRFXXDataFormat.LED);
         }
 
         #endregion
