@@ -10,6 +10,7 @@ namespace ThinkingHome.NooLite
         #region events
         
         public event Action<object, ReceivedData> ReceiveData;
+        public event Action<object, ReceivedMicroclimateData> ReceiveMicroclimateData;
         public event Action<object> Connect;
         public event Action<object> Disconnect;
         public event Action<object, Exception> Error;
@@ -67,7 +68,14 @@ namespace ThinkingHome.NooLite
                         bytes[0] = ReceivedData.START_MARKER;
                         device.Read(bytes, 1, BUFFER_SIZE - 1);
 
-                        ReceiveData?.Invoke(this, ReceivedData.Parse(bytes));
+                        var data = ReceivedData.Parse(bytes);
+                        ReceiveData?.Invoke(this, data);
+                        
+                        if (data.Command == MTRFXXCommand.MicroclimateData && data.DataFormat == (byte)MTRFXXDataFormat.FourByteData)
+                        {
+                            var microclimateData = new ReceivedMicroclimateData(bytes);
+                            ReceiveMicroclimateData?.Invoke(this, microclimateData);
+                        }
                     }
                 }
             }

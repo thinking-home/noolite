@@ -23,29 +23,31 @@ namespace ThinkingHome.NooLite
 
             return res;
         }
-
+        
         #endregion
         
         #region fields
-        
-        public readonly MTRFXXMode Mode;
-        
-        public readonly ResultCode Result;
 
-        public readonly int Remains;
+        private readonly byte[] data;
         
-        public readonly int Channel;
-
-        public readonly MTRFXXCommand Command;
-
-        public readonly byte DataFormat;
+        public MTRFXXMode Mode => (MTRFXXMode) data[1];
         
-        public readonly byte Data1;
-        public readonly byte Data2;
-        public readonly byte Data3;
-        public readonly byte Data4;
+        public ResultCode Result => (ResultCode) data[2];
 
-        public readonly UInt32 DeviceId;
+        public int Remains => Mode == MTRFXXMode.RX | Mode == MTRFXXMode.RXF ? 0 : data[3];
+        
+        public int Channel => data[4];
+
+        public MTRFXXCommand Command => (MTRFXXCommand) data[5];
+
+        public byte DataFormat => data[6];
+        
+        public byte Data1 => data[7];
+        public byte Data2 => data[8];
+        public byte Data3 => data[9];
+        public byte Data4 => data[10];
+
+        public UInt32 DeviceId => ParseDeviceId(data);
         
         #endregion
         
@@ -55,20 +57,8 @@ namespace ThinkingHome.NooLite
             if (data.Length != BUFFER_SIZE) throw new ArgumentException("Invalid buffer length", nameof(data));
             if (data.First() != START_MARKER) throw new ArgumentException("Invalid start marker", nameof(data));
             if (data.Last() != STOP_MARKER) throw new ArgumentException("Invalid stop marker", nameof(data));
-            
-            Mode = (MTRFXXMode) data[1];
-            Result = (ResultCode) data[2];
-            Remains = Mode == MTRFXXMode.RX | Mode == MTRFXXMode.RXF ? 0 : data[3];
-            Channel = data[4];
-            Command = (MTRFXXCommand) data[5];
 
-            DataFormat = data[6];
-            Data1 = data[7];
-            Data2 = data[8];
-            Data3 = data[9];
-            Data4 = data[10];
-
-            DeviceId = ParseDeviceId(data);
+            this.data = (byte[])data.Clone();;
         }
 
         public override string ToString()
