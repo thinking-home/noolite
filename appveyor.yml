@@ -1,0 +1,12 @@
+version: '{build}'
+
+image: Visual Studio 2017 Preview
+
+install:
+  - dotnet --info
+  - dotnet restore
+
+test_script:
+  - dotnet test ./ThinkingHome.NooLite.Tests -c Release -f netcoreapp2.0
+
+build: off
