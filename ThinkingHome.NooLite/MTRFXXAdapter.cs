@@ -10,7 +10,7 @@ namespace ThinkingHome.NooLite
         #region events
         
         public event Action<object, ReceivedData> ReceiveData;
-        public event Action<object, ReceivedMicroclimateData> ReceiveMicroclimateData;
+        public event Action<object, MicroclimateData> ReceiveMicroclimateData;
         public event Action<object> Connect;
         public event Action<object> Disconnect;
         public event Action<object, Exception> Error;
@@ -73,7 +73,7 @@ namespace ThinkingHome.NooLite
                         
                         if (data.Command == MTRFXXCommand.MicroclimateData && data.DataFormat == (byte)MTRFXXDataFormat.FourByteData)
                         {
-                            var microclimateData = new ReceivedMicroclimateData(bytes);
+                            var microclimateData = new MicroclimateData(bytes);
                             ReceiveMicroclimateData?.Invoke(this, microclimateData);
                         }
                     }

@@ -66,7 +66,7 @@ private static void AdapterOnReceiveData(object obj, ReceivedData result)
     Console.WriteLine(result);
 }
 
-private static void AdapterOnReceiveMicroclimateData(object obj, ReceivedMicroclimateData result)
+private static void AdapterOnReceiveMicroclimateData(object obj, MicroclimateData result)
 {
     Console.WriteLine($"temperature: {result.Temperature}, humidity: {result.Humidity}");
 }

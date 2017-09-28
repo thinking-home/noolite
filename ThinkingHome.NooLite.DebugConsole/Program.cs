@@ -94,7 +94,7 @@ namespace ThinkingHome.NooLite.DebugConsole
             }
         }
 
-        private static void AdapterOnReceiveMicroclimateData(object o, ReceivedMicroclimateData result)
+        private static void AdapterOnReceiveMicroclimateData(object o, MicroclimateData result)
         {
             Console.WriteLine($"temperature: {result.Temperature}, humidity: {result.Humidity}");
         }
