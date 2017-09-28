@@ -10,9 +10,9 @@ namespace ThinkingHome.NooLite
         
         public decimal Temperature => ParseTemperature(Data1, Data2);
 
-        public int Humidity => Data3;
+        public int? Humidity => ParseHumidity(Data2, Data3);
         
-        public static decimal ParseTemperature(byte data1, byte data2)
+        private static decimal ParseTemperature(byte data1, byte data2)
         {
             int value = ((data2 & 0x0F) << 8) + data1;
 
@@ -22,6 +22,14 @@ namespace ThinkingHome.NooLite
             }
 
             return ((decimal)value) / 10;
+        }
+
+        private static int? ParseHumidity(byte data2, byte data3)
+        {
+            var type = (data2 >> 4) & 0b111; 
+            
+            // sensor type: 1 - PT112, 2 - PT111
+            return type == 2 ? (int?)data3 : null;
         }
 
         public override string ToString()
