@@ -1,0 +1,9 @@
+language: csharp  
+sudo: required  
+mono: none
+dotnet: 2.0.0
+dist: trusty  
+before_script:
+  - dotnet restore
+script:  
+  - dotnet test ./ThinkingHome.NooLite.Tests -c Release -f netcoreapp2.0
