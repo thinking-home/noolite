@@ -1,4 +1,4 @@
-# ThinkingHome.NooLite 
+# ThinkingHome.NooLite
 
 [![Travis](https://img.shields.io/travis/thinking-home/noolite.svg)](https://travis-ci.org/thinking-home/noolite)
 [![AppVeyor](https://img.shields.io/appveyor/ci/dima117/noolite.svg)](https://ci.appveyor.com/project/dima117/noolite)
@@ -33,23 +33,23 @@ static void Main(string[] args)
     // при использовании в Windows имя будет похоже на "COM4"
     using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI"))
     {
-        // добавляем действия при подключени к адаптеру и при отключении  
+        // добавляем действия при подключени к адаптеру и при отключении
         adapter.Connect += AdapterOnConnect;
         adapter.Disconnect += AdapterOnDisconnect;
 
         // добавляем обработчики входящих команд
         adapter.ReceiveData += AdapterOnReceiveData;
         adapter.ReceiveMicroclimateData += AdapterOnReceiveMicroclimateData;
-        
+
         // обработка ошибок
         adapter.Error += AdapterOnError;
-    
+
         // открываем соединение
         adapter.Open();
-    
+
         // досрочный выход из сервисного режима
         adapter.ExitServiceMode();
-    
+
         // включение света в 13 канале (nooLite-F)
         adapter.OnF(13);
     }
@@ -133,6 +133,12 @@ void LoadPreset(byte channel)
 
 ```csharp
 void SetLedColor(byte channel, byte valueR, byte valueG, byte valueB)
+```
+
+Включить режим плавного изменения цветов светодиодной RGB ленты:
+
+```csharp
+void StartColorChanging(byte channel)
 ```
 
 Изменить цвет светодиодной RGB ленты на следующий:
