@@ -11,6 +11,8 @@ namespace ThinkingHome.NooLite
         public decimal Temperature => ParseTemperature(Data1, Data2);
 
         public int? Humidity => ParseHumidity(Data2, Data3);
+
+        public bool LowBattery => Data2 >> 7 == 1;
         
         private static decimal ParseTemperature(byte data1, byte data2)
         {
