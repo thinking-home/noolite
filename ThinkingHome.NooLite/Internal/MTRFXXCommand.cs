@@ -3,7 +3,7 @@
     public enum MTRFXXCommand : byte
     {
         None = 0,
-        
+
         Off = 0,
         BrightnessDown = 1,
         On = 2,
@@ -23,12 +23,12 @@
 
         Bind = 15,
         Unbind = 9,
-        
-        StartColorChanging = 16,
+
+        SwitchColorChanging = 16,
         ChangeColor = 17,
         ChangeColorMode = 18,
         ChangeColorSpeed = 19,
-        
+
         LowBatteryStatus = 20,
         MicroclimateData = 21,
         TemporarySwitchOn = 25,

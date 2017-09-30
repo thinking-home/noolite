@@ -172,14 +172,14 @@ namespace ThinkingHome.NooLite
 
         #region cmd: start color changing
 
-        public static void StartColorChanging(this MTRFXXAdapter adapter, byte channel)
+        public static void SwitchColorChanging(this MTRFXXAdapter adapter, byte channel)
         {
-            SendData(adapter, MTRFXXCommand.StartColorChanging, false, channel, null, MTRFXXDataFormat.LED);
+            SendData(adapter, MTRFXXCommand.SwitchColorChanging, false, channel, null, MTRFXXDataFormat.LED);
         }
 
-        public static void StartColorChangingF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
+        public static void SwitchColorChangingF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
         {
-            SendData(adapter, MTRFXXCommand.StartColorChanging, true, channel, deviceId, MTRFXXDataFormat.LED);
+            SendData(adapter, MTRFXXCommand.SwitchColorChanging, true, channel, deviceId, MTRFXXDataFormat.LED);
         }
 
         #endregion

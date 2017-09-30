@@ -138,7 +138,7 @@ void SetLedColor(byte channel, byte valueR, byte valueG, byte valueB)
 Включить режим плавного изменения цветов светодиодной RGB ленты:
 
 ```csharp
-void StartColorChanging(byte channel)
+void SwitchColorChanging(byte channel)
 ```
 
 Изменить цвет светодиодной RGB ленты на следующий:
