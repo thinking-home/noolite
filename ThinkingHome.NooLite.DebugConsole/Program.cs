@@ -20,12 +20,24 @@ namespace ThinkingHome.NooLite.DebugConsole
             {
                 adapter.Connect += AdapterOnConnect;
                 adapter.Disconnect += AdapterOnDisconnect;
-                
+
                 adapter.ReceiveData += AdapterOnReceiveData;
                 adapter.ReceiveMicroclimateData += AdapterOnReceiveMicroclimateData;
-                
+
                 adapter.Error += AdapterOnError;
-                
+
+//                Console.WriteLine("open");
+//                adapter.Open();
+//                Console.ReadKey();
+//
+//                Console.WriteLine("exit service mode");
+//                adapter.ExitServiceMode();
+//                Console.ReadKey();
+//
+//                Console.WriteLine("close");
+//                adapter.Close();
+//                Console.ReadKey();
+
                 Console.WriteLine("open");
                 adapter.Open();
                 Console.ReadKey();
@@ -34,19 +46,7 @@ namespace ThinkingHome.NooLite.DebugConsole
                 adapter.ExitServiceMode();
                 Console.ReadKey();
 
-                Console.WriteLine("close");
-                adapter.Close();
-                Console.ReadKey();
 
-                Console.WriteLine("open");
-                adapter.Open();
-                Console.ReadKey();
-
-                Console.WriteLine("exit service mode");
-                adapter.ExitServiceMode();
-                Console.ReadKey();
-
-                
 //                Console.WriteLine("bind");
 //                adapter.BindF(13);
 //
@@ -56,47 +56,47 @@ namespace ThinkingHome.NooLite.DebugConsole
 //                adapter.Bind(Mode.NooLiteF, 13);
 //
 //                Console.ReadKey();
-                
-//                
+
+//
 //                Console.WriteLine("unbind");
 //                adapter.Unbind(Mode.NooLiteF, 13);
 //
 //                Console.ReadKey();
 
-                Console.WriteLine("on");
-                adapter.OnF(13, 1594);
-
-                Console.ReadKey();
-
-                Console.WriteLine("off");
-                adapter.OffF(13, 1594);
-
-                Console.ReadKey();
-                
-                Console.WriteLine("on");
-                adapter.OnF(13, 2405);    
-
-                Console.ReadKey();
-
-                Console.WriteLine("off");
-                adapter.OffF(13, 2405);
-
-                Console.ReadKey();
-                
-                
-//                Console.WriteLine("bind: start");
-//                adapter.BindStart(13);
+//                Console.WriteLine("on");
+//                adapter.OnF(13, 1594);
 //
 //                Console.ReadKey();
-//                
-//                Console.WriteLine("bind: stop");
-//                adapter.BindStop();
+//
+//                Console.WriteLine("off");
+//                adapter.OffF(13, 1594);
+//
+//                Console.ReadKey();
+//
+//                Console.WriteLine("on");
+//                adapter.OnF(13, 2405);
+//
+//                Console.ReadKey();
+//
+//                Console.WriteLine("off");
+//                adapter.OffF(13, 2405);
+//
+//                Console.ReadKey();
+
+
+                Console.WriteLine("bind: start");
+                adapter.BindStart(13);
+
+                Console.ReadKey();
+
+                Console.WriteLine("bind: stop");
+                adapter.BindStop();
             }
         }
 
         private static void AdapterOnReceiveMicroclimateData(object o, MicroclimateData result)
         {
-            Console.WriteLine($"temperature: {result.Temperature}, humidity: {result.Humidity}");
+            Console.WriteLine(result);
         }
 
         private static void AdapterOnError(object obj, Exception ex)

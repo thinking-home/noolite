@@ -8,22 +8,22 @@ namespace ThinkingHome.NooLite
     public class MTRFXXAdapter : IDisposable
     {
         #region events
-        
+
         public event Action<object, ReceivedData> ReceiveData;
         public event Action<object, MicroclimateData> ReceiveMicroclimateData;
         public event Action<object> Connect;
         public event Action<object> Disconnect;
         public event Action<object, Exception> Error;
-        
+
         #endregion
-        
+
         #region common
 
         private readonly object lockObject = new object();
-        
+
         private const int READING_INTERVAL = 50;
         private const int BUFFER_SIZE = 17;
-        
+
         private readonly SerialPort device;
         private readonly Timer timer;
 
@@ -70,8 +70,8 @@ namespace ThinkingHome.NooLite
 
                         var data = ReceivedData.Parse(bytes);
                         ReceiveData?.Invoke(this, data);
-                        
-                        if (data.Command == MTRFXXCommand.MicroclimateData && data.DataFormat == (byte)MTRFXXDataFormat.FourByteData)
+
+                        if (data.Command == MTRFXXCommand.MicroclimateData && data.DataFormat == (byte)MTRFXXDataFormat.MicroclimateData)
                         {
                             var microclimateData = new MicroclimateData(bytes);
                             ReceiveMicroclimateData?.Invoke(this, microclimateData);
@@ -112,7 +112,7 @@ namespace ThinkingHome.NooLite
         }
 
         #endregion
-        
+
         #region commands
 
         public void SendCommand(MTRFXXMode mode, MTRFXXAction action, byte channel, MTRFXXCommand command,
@@ -128,7 +128,7 @@ namespace ThinkingHome.NooLite
         #region commands: static
 
         public const byte START_MARKER = 171;
-        
+
         public const byte STOP_MARKER = 172;
 
         public static byte[] BuildCommand(MTRFXXMode mode, MTRFXXAction action, MTRFXXRepeatCount repeatCount, byte channel,
@@ -141,12 +141,12 @@ namespace ThinkingHome.NooLite
             byte id4 = (byte)target;
 
             byte[] d = data ?? new byte[0];
-            
+
             byte d1 = d.Length > 0 ? d[0] : (byte)0;
-            byte d2 = d.Length > 1 ? d[1] : (byte)0;  
+            byte d2 = d.Length > 1 ? d[1] : (byte)0;
             byte d3 = d.Length > 2 ? d[2] : (byte)0;
             byte d4 = d.Length > 3 ? d[3] : (byte)0;
-            
+
             var res = new byte[]
             {
                 START_MARKER, // 0: start marker
