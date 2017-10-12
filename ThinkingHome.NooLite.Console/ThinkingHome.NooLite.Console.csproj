@@ -5,6 +5,9 @@
         <TargetFramework>netcoreapp2.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="PowerArgs" Version="3.0.0"/>
+        <PackageReference Include="PowerArgs" Version="3.0.0" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\ThinkingHome.NooLite\ThinkingHome.NooLite.csproj" />
     </ItemGroup>
 </Project>
