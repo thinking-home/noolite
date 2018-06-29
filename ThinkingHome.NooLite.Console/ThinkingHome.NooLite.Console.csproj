@@ -1,10 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../Package.xml" />
   <PropertyGroup>
+    <Description>.NET Core API for the wireless control of appliances using the nooLite system (including nooLite-F mode). Adapter MTRF-64-USB is supported.</Description>
     <OutputType>Exe</OutputType>
-    <AssemblyName>noolite</AssemblyName>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>noolite</ToolCommandName>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ThinkingHome.NooLite\ThinkingHome.NooLite.csproj" />
   </ItemGroup>
 </Project>

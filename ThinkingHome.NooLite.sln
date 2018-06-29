@@ -16,6 +16,7 @@ ProjectSection(SolutionItems) = preProject
 	README.md = README.md
 	.travis.yml = .travis.yml
 	appveyor.yml = appveyor.yml
+	Package.xml = Package.xml
 EndProjectSection
 EndProject
 Global
