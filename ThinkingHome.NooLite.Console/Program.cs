@@ -20,8 +20,8 @@ namespace ThinkingHome.NooLite.Console
             return new CommonArgs
             {
                 Port = cmd.Argument<string>("port", "Serial port name which nooLite adapter connected to."),
-                Channel = cmd.Argument<byte>("channel", "Target channel"),
-                ModeF = cmd.Option<byte>("-f", "Set the nooLite-F mode.", CommandOptionType.NoValue)
+                Channel = cmd.Argument<byte>("channel", "Adapter channel in which need to send the command."),
+                ModeF = cmd.Option<byte>("-f", "Switch the adapter into noolite-F mode.", CommandOptionType.NoValue)
             };
         }
 
@@ -60,6 +60,12 @@ namespace ThinkingHome.NooLite.Console
             app.Command("off", OffCommand);
             app.Command("switch", SwitchCommand);
 
+            app.Command("set-brightness", SetBrightnessCommand);
+            app.Command("save-preset", SavePresetCommand);
+            app.Command("load-preset", LoadPresetCommand);
+            app.Command("change-color", ChangeColorCommand);
+            app.Command("set-color", SetColorCommand);
+
             app.OnExecute(() => { app.ShowHelp(); });
 
             try
@@ -78,7 +84,7 @@ namespace ThinkingHome.NooLite.Console
         {
             var args = AddCommonArgs(cmd);
 
-            cmd.Description = "123";
+            cmd.Description = "Binds the specified adapter channel to the nooLite power unit.";
             cmd.OnExecute(() => Invoke(args, (a, c) => a.Bind(c), (a, c) => a.BindF(c)));
         }
 
@@ -86,7 +92,7 @@ namespace ThinkingHome.NooLite.Console
         {
             var args = AddCommonArgs(cmd);
 
-            cmd.Description = "123";
+            cmd.Description = "Unbinds the specified adapter channel from the nooLite power unit.";
             cmd.OnExecute(() => Invoke(args, (a, c) => a.Unbind(c), (a, c) => a.UnbindF(c)));
         }
 
@@ -94,7 +100,7 @@ namespace ThinkingHome.NooLite.Console
         {
             var args = AddCommonArgs(cmd);
 
-            cmd.Description = "123";
+            cmd.Description = "Turns on the power units in the specified adapter channel.";
             cmd.OnExecute(() => Invoke(args, (a, c) => a.On(c), (a, c) => a.OnF(c)));
         }
 
@@ -102,7 +108,7 @@ namespace ThinkingHome.NooLite.Console
         {
             var args = AddCommonArgs(cmd);
 
-            cmd.Description = "123";
+            cmd.Description = "Turns off the power units in the specified adapter channel.";
             cmd.OnExecute(() => Invoke(args, (a, c) => a.Off(c), (a, c) => a.OffF(c)));
         }
 
@@ -110,8 +116,57 @@ namespace ThinkingHome.NooLite.Console
         {
             var args = AddCommonArgs(cmd);
 
-            cmd.Description = "123";
+            cmd.Description = "Inverts state of the power units in the specified adapter channel.";
             cmd.OnExecute(() => Invoke(args, (a, c) => a.Switch(c), (a, c) => a.SwitchF(c)));
+        }
+
+        private static void SetBrightnessCommand(CommandLineApplication cmd)
+        {
+            var args = AddCommonArgs(cmd);
+            var brightness = cmd.Argument<byte>("brightness", "brightness level (0..255)");
+
+            cmd.Description = "Sets brightness level in the specified adapter channel.";
+            cmd.OnExecute(() => Invoke(args,
+                (a, c) => a.SetBrightness(c, brightness.ParsedValue),
+                (a, c) => a.SetBrightnessF(c, brightness.ParsedValue)));
+        }
+
+        private static void SavePresetCommand(CommandLineApplication cmd)
+        {
+            var args = AddCommonArgs(cmd);
+
+            cmd.Description = "Saves current state of the power units in the specified adapter channel.";
+            cmd.OnExecute(() => Invoke(args, (a, c) => a.SavePreset(c), (a, c) => a.SavePresetF(c)));
+        }
+
+        private static void LoadPresetCommand(CommandLineApplication cmd)
+        {
+            var args = AddCommonArgs(cmd);
+
+            cmd.Description = "Loads the saved state of the power units in the specified adapter channel.";
+            cmd.OnExecute(() => Invoke(args, (a, c) => a.LoadPreset(c), (a, c) => a.LoadPresetF(c)));
+        }
+
+        private static void ChangeColorCommand(CommandLineApplication cmd)
+        {
+            var args = AddCommonArgs(cmd);
+
+            cmd.Description = "Changes LED strip light color in the specified adapter channel to another predefined color.";
+            cmd.OnExecute(() => Invoke(args, (a, c) => a.ChangeLedColor(c), (a, c) => a.ChangeLedColorF(c)));
+        }
+
+        private static void SetColorCommand(CommandLineApplication cmd)
+        {
+            var args = AddCommonArgs(cmd);
+
+            var colorR = cmd.Argument<byte>("red", "Red color level (0..255)");
+            var colorG = cmd.Argument<byte>("green", "Green color level (0..255)");
+            var colorB = cmd.Argument<byte>("blue", "Blue color level (0..255)");
+
+            cmd.Description = "Changes LED strip light color in the specified adapter channel to specified color.";
+            cmd.OnExecute(() => Invoke(args,
+                (a, channel) => a.SetLedColor(channel, colorR.ParsedValue, colorG.ParsedValue, colorB.ParsedValue),
+                (a, channel) => a.SetLedColorF(channel, colorR.ParsedValue, colorG.ParsedValue, colorB.ParsedValue)));
         }
     }
 }
