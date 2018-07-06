@@ -6,25 +6,40 @@ namespace ThinkingHome.NooLite.Console
 {
     class Program
     {
-        private static CommandOption<string> optionPort;
-        private static CommandOption<byte> optionChannel;
-        private static CommandOption optionMode;
-
-        static void Invoke(Action<MTRFXXAdapter, byte> action, Action<MTRFXXAdapter, byte> actionF)
+        class CommonArgs
         {
-            using (var adapter = new MTRFXXAdapter(optionPort.ParsedValue))
+            public CommandArgument<string> Port { get; set; }
+            public CommandArgument<byte> Channel { get; set; }
+            public CommandOption ModeF { get; set; }
+        }
+
+        private static CommonArgs AddCommonArgs(CommandLineApplication cmd)
+        {
+            cmd.HelpOption("-?|-h|--help");
+
+            return new CommonArgs
+            {
+                Port = cmd.Argument<string>("port", "Serial port name which nooLite adapter connected to."),
+                Channel = cmd.Argument<byte>("channel", "Target channel"),
+                ModeF = cmd.Option<byte>("-f", "Set the nooLite-F mode.", CommandOptionType.NoValue)
+            };
+        }
+
+        static void Invoke(CommonArgs args, Action<MTRFXXAdapter, byte> action, Action<MTRFXXAdapter, byte> actionF)
+        {
+            using (var adapter = new MTRFXXAdapter(args.Port.ParsedValue))
             {
                 adapter.Open();
                 adapter.ExitServiceMode();
 
 
-                if (optionMode.HasValue())
+                if (args.ModeF.HasValue())
                 {
-                    actionF(adapter, optionChannel.ParsedValue);
+                    actionF(adapter, args.Channel.ParsedValue);
                 }
                 else
                 {
-                    action(adapter, optionChannel.ParsedValue);
+                    action(adapter, args.Channel.ParsedValue);
                 }
             }
         }
@@ -39,39 +54,13 @@ namespace ThinkingHome.NooLite.Console
             app.HelpOption("-?|-h|--help");
             app.ExtendedHelpText = "\nSee the details on https://github.com/thinking-home/noolite#readme.";
 
-            optionPort = app.Option<string>("-p|--port", "Serial port name which nooLite adapter connected to.", CommandOptionType.SingleValue);
-            optionChannel = app.Option<byte>("-c|--channel", "Target channel.", CommandOptionType.SingleValue);
-            optionMode = app.Option("-f", "Set the nooLite-F mode.", CommandOptionType.NoValue);
+            app.Command("bind", BindCommand);
+            app.Command("unbind", UnbindCommand);
+            app.Command("on", OnCommand);
+            app.Command("off", OffCommand);
+            app.Command("switch", SwitchCommand);
 
-            app.Command("bind", cmd =>
-            {
-                cmd.Description = "123";
-                cmd.OnExecute(() => Invoke((a, c) => a.Bind(c), (a, c) => a.BindF(c)));
-            });
-
-            app.Command("unbind", cmd =>
-            {
-                cmd.Description = "123";
-                cmd.OnExecute(() => Invoke((a, c) => a.Unbind(c), (a, c) => a.UnbindF(c)));
-            });
-
-            app.Command("on", cmd =>
-            {
-                cmd.Description = "123";
-                cmd.OnExecute(() => Invoke((a, c) => a.On(c), (a, c) => a.OnF(c)));
-            });
-
-            app.Command("off", cmd =>
-            {
-                cmd.Description = "123";
-                cmd.OnExecute(() => Invoke((a, c) => a.Off(c), (a, c) => a.OffF(c)));
-            });
-
-            app.Command("switch", cmd =>
-            {
-                cmd.Description = "123";
-                cmd.OnExecute(() => Invoke((a, c) => a.Switch(c), (a, c) => a.SwitchF(c)));
-            });
+            app.OnExecute(() => { app.ShowHelp(); });
 
             try
             {
@@ -83,6 +72,46 @@ namespace ThinkingHome.NooLite.Console
                 app.ShowHelp();
                 Environment.ExitCode = 1;
             }
+        }
+
+        private static void BindCommand(CommandLineApplication cmd)
+        {
+            var args = AddCommonArgs(cmd);
+
+            cmd.Description = "123";
+            cmd.OnExecute(() => Invoke(args, (a, c) => a.Bind(c), (a, c) => a.BindF(c)));
+        }
+
+        private static void UnbindCommand(CommandLineApplication cmd)
+        {
+            var args = AddCommonArgs(cmd);
+
+            cmd.Description = "123";
+            cmd.OnExecute(() => Invoke(args, (a, c) => a.Unbind(c), (a, c) => a.UnbindF(c)));
+        }
+
+        private static void OnCommand(CommandLineApplication cmd)
+        {
+            var args = AddCommonArgs(cmd);
+
+            cmd.Description = "123";
+            cmd.OnExecute(() => Invoke(args, (a, c) => a.On(c), (a, c) => a.OnF(c)));
+        }
+
+        private static void OffCommand(CommandLineApplication cmd)
+        {
+            var args = AddCommonArgs(cmd);
+
+            cmd.Description = "123";
+            cmd.OnExecute(() => Invoke(args, (a, c) => a.Off(c), (a, c) => a.OffF(c)));
+        }
+
+        private static void SwitchCommand(CommandLineApplication cmd)
+        {
+            var args = AddCommonArgs(cmd);
+
+            cmd.Description = "123";
+            cmd.OnExecute(() => Invoke(args, (a, c) => a.Switch(c), (a, c) => a.SwitchF(c)));
         }
     }
 }
