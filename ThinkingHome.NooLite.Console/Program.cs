@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using McMaster.Extensions.CommandLineUtils;
+using ThinkingHome.NooLite.Ports;
 
 namespace ThinkingHome.NooLite.Console
 {
@@ -54,6 +55,8 @@ namespace ThinkingHome.NooLite.Console
             app.HelpOption("-?|-h|--help");
             app.ExtendedHelpText = "\nSee the details on https://github.com/thinking-home/noolite#readme.";
 
+            app.Command("ports", PortsCommand);
+
             app.Command("bind", BindCommand);
             app.Command("unbind", UnbindCommand);
             app.Command("on", OnCommand);
@@ -78,6 +81,21 @@ namespace ThinkingHome.NooLite.Console
                 app.ShowHelp();
                 Environment.ExitCode = 1;
             }
+        }
+
+        private static void PortsCommand(CommandLineApplication cmd)
+        {
+            cmd.HelpOption("-?|-h|--help");
+            cmd.Description = "Display the list of the serial ports on this computer.";
+            cmd.OnExecute(() =>
+            {
+                System.Console.WriteLine("Serial port list:");
+
+                foreach (var portName in SerialPort.GetPortNames())
+                {
+                    System.Console.WriteLine($"- {portName}");
+                }
+            });
         }
 
         private static void BindCommand(CommandLineApplication cmd)
