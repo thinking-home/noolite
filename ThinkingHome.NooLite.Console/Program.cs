@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
 using ThinkingHome.NooLite.Ports;
 
@@ -32,7 +33,7 @@ namespace ThinkingHome.NooLite.Console
             {
                 adapter.Open();
                 adapter.ExitServiceMode();
-
+                Thread.Sleep(50);
 
                 if (args.ModeF.HasValue())
                 {
@@ -42,6 +43,8 @@ namespace ThinkingHome.NooLite.Console
                 {
                     action(adapter, args.Channel.ParsedValue);
                 }
+
+                Thread.Sleep(100);
             }
         }
 

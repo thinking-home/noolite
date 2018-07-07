@@ -1,22 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="../Package.xml" />
-  <PropertyGroup>
-    <Description>
-      Command line interface for the wireless control of appliances using the nooLite system (including nooLite-F mode). Adapter MTRF-64-USB is supported.
+    <Import Project="../Package.xml"/>
+    <PropertyGroup>
+        <Description>Command line interface for the wireless control of appliances using the nooLite system (including nooLite-F mode). Adapter MTRF-64-USB is supported.
 
-      http://www.noo.com.by</Description>
-  </PropertyGroup>
+http://www.noo.com.by
+        </Description>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <PackAsTool>true</PackAsTool>
-    <ToolCommandName>noolite</ToolCommandName>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.4" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ThinkingHome.NooLite\ThinkingHome.NooLite.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>noolite</ToolCommandName>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.4"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\ThinkingHome.NooLite\ThinkingHome.NooLite.csproj"/>
+    </ItemGroup>
 </Project>

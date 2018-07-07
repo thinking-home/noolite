@@ -85,7 +85,7 @@ namespace ThinkingHome.NooLite.DebugConsole
 
 
                 Console.WriteLine("bind: start");
-                adapter.BindStart(13);
+                adapter.On(64);
 
                 Console.ReadKey();
 
