@@ -61,6 +61,8 @@ namespace ThinkingHome.NooLite.Console
             app.Command("ports", PortsCommand);
 
             app.Command("bind", BindCommand);
+            app.Command("bindstart", BindStartCommand);
+            app.Command("bindstop", BindStopCommand);
             app.Command("unbind", UnbindCommand);
             app.Command("on", OnCommand);
             app.Command("off", OffCommand);
@@ -107,6 +109,22 @@ namespace ThinkingHome.NooLite.Console
 
             cmd.Description = "Binds the specified adapter channel to the nooLite power unit.";
             cmd.OnExecute(() => Invoke(args, (a, c) => a.Bind(c), (a, c) => a.BindF(c)));
+        }
+
+        private static void BindStartCommand(CommandLineApplication cmd)
+        {
+            var args = AddCommonArgs(cmd);
+
+            cmd.Description = "Enter bind mode to pair nooLite sensor.";
+            cmd.OnExecute(() => Invoke(args, (a, c) => a.BindStart(c), null));
+        }
+
+        private static void BindStopCommand(CommandLineApplication cmd)
+        {
+            var args = AddCommonArgs(cmd);
+
+            cmd.Description = "Disable bind mode to pair nooLite sensor.";
+            cmd.OnExecute(() => Invoke(args, (a, c) => a.BindStop(), null));
         }
 
         private static void UnbindCommand(CommandLineApplication cmd)
