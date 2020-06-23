@@ -64,8 +64,6 @@ namespace ThinkingHome.NooLite.Console
             app.Command("bindstart", BindStartCommand);
             app.Command("bindstop", BindStopCommand);
             app.Command("unbind", UnbindCommand);
-            app.Command("bindstart", BindStartCommand);
-            app.Command("bindstop", BindStopCommand);
             app.Command("on", OnCommand);
             app.Command("off", OffCommand);
             app.Command("switch", SwitchCommand);
@@ -117,30 +115,6 @@ namespace ThinkingHome.NooLite.Console
         {
             var args = AddCommonArgs(cmd);
 
-            cmd.Description = "Enter bind mode to pair nooLite sensor.";
-            cmd.OnExecute(() => Invoke(args, (a, c) => a.BindStart(c), null));
-        }
-
-        private static void BindStopCommand(CommandLineApplication cmd)
-        {
-            var args = AddCommonArgs(cmd);
-
-            cmd.Description = "Disable bind mode to pair nooLite sensor.";
-            cmd.OnExecute(() => Invoke(args, (a, c) => a.BindStop(), null));
-        }
-
-        private static void UnbindCommand(CommandLineApplication cmd)
-        {
-            var args = AddCommonArgs(cmd);
-
-            cmd.Description = "Unbinds the specified adapter channel from the nooLite power unit.";
-            cmd.OnExecute(() => Invoke(args, (a, c) => a.Unbind(c), (a, c) => a.UnbindF(c)));
-        }
-
-        private static void BindStartCommand(CommandLineApplication cmd)
-        {
-            var args = AddCommonArgs(cmd);
-
             cmd.Description = "Start binding the specified adapter channel to the nooLite sensor.";
             cmd.OnExecute(() => Invoke(args, (a, c) => a.BindStart(c), (a, c) => a.BindStart(c)));
         }
@@ -152,7 +126,15 @@ namespace ThinkingHome.NooLite.Console
             cmd.Description = "Stop binding the specified adapter channel from the nooLite sensor.";
             cmd.OnExecute(() => Invoke(args, (a, c) => a.BindStop(), (a, c) => a.BindStop()));
         }
-    
+
+        private static void UnbindCommand(CommandLineApplication cmd)
+        {
+            var args = AddCommonArgs(cmd);
+
+            cmd.Description = "Unbinds the specified adapter channel from the nooLite power unit.";
+            cmd.OnExecute(() => Invoke(args, (a, c) => a.Unbind(c), (a, c) => a.UnbindF(c)));
+        }
+
         private static void OnCommand(CommandLineApplication cmd)
         {
             var args = AddCommonArgs(cmd);
