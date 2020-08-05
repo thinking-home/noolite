@@ -288,6 +288,12 @@ namespace ThinkingHome.NooLite
             adapter.SendCommand(MTRFXXMode.Service, MTRFXXAction.SendCommand, 0, MTRFXXCommand.None);
         }
 
+
+        public static void ReadState(this MTRFXXAdapter adapter, byte channel)
+        {
+            adapter.SendCommand(MTRFXXMode.TXF, MTRFXXAction.SendCommand, channel, MTRFXXCommand.ReadState);
+        }
+
         #endregion
     }
 }
