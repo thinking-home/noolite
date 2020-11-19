@@ -1,9 +1,9 @@
-language: csharp  
-sudo: required  
+os: linux
+dist: bionic
+language: csharp
 mono: none
-dotnet: 2.0.0
-dist: trusty  
+dotnet: 5.0.100
 before_script:
   - dotnet restore
-script:  
-  - dotnet test ./ThinkingHome.NooLite.Tests -c Release -f netcoreapp2.0
+script:
+  - dotnet test ./ThinkingHome.NooLite.Tests -c Release -f net5.0
