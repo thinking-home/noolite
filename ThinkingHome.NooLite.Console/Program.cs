@@ -1,8 +1,8 @@
 ﻿using System;
+using System.IO.Ports;
 using System.Reflection;
 using System.Threading;
 using McMaster.Extensions.CommandLineUtils;
-using ThinkingHome.NooLite.Ports;
 
 namespace ThinkingHome.NooLite.Console
 {

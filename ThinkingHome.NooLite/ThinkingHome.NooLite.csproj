@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="../Package.xml"/>
+    <Import Project="../Package.xml" />
     <PropertyGroup>
         <Description>.NET Core API for the wireless control of appliances using the nooLite system (including nooLite-F mode). Adapter MTRF-64-USB is supported.
 
@@ -7,11 +7,10 @@ http://www.noo.com.by
         </Description>
     </PropertyGroup>
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.Win32.Registry" Version="4.5.0"/>
-        <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0"/>
+        <PackageReference Include="System.IO.Ports" Version="5.0.0" />
     </ItemGroup>
 </Project>

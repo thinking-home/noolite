@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
-using System.Threading;
-using ThinkingHome.NooLite.Ports;
+using System.IO.Ports;
 
 namespace ThinkingHome.NooLite.DebugConsole
 {
@@ -9,12 +7,12 @@ namespace ThinkingHome.NooLite.DebugConsole
     {
         static void Main(string[] args)
         {
-//            foreach (var name in SerialPort.GetPortNames())
-//            {
-//                Console.WriteLine(name);
-//            }
-//
-//            return;
+            foreach (var name in SerialPort.GetPortNames())
+            {
+                Console.WriteLine(name);
+            }
+
+            return;
             //using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AI04XT35"))
             using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI"))
             {

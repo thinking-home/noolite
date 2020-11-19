@@ -1,7 +1,7 @@
 ﻿using System;
+using System.IO.Ports;
 using System.Threading;
 using ThinkingHome.NooLite.Internal;
-using ThinkingHome.NooLite.Ports;
 
 namespace ThinkingHome.NooLite
 {
