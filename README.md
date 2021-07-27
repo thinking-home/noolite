@@ -11,13 +11,13 @@
 Package Manager
 
 ```
-Install-Package ThinkingHome.NooLite -Version 4.0.0-rc-1
+Install-Package ThinkingHome.NooLite -Version 4.0.0
 ```
 
 .NET CLI
 
 ```
-dotnet add package ThinkingHome.NooLite --version 4.0.0-rc-1
+dotnet add package ThinkingHome.NooLite --version 4.0.0
 ```
 
 ## Пример использования

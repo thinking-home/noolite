@@ -4,24 +4,13 @@
         <Description>.NET Core API for the wireless control of appliances using the nooLite system (including nooLite-F mode). Adapter MTRF-64-USB is supported.
 
 http://www.noo.com.by
-</Description>
+        </Description>
     </PropertyGroup>
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Version>4.0.0-rc-5-1530995509343</Version>
-        <PackageId>noolite</PackageId>
-        <Authors>Dmitry Andriyanov &lt;dima117a@gmail.com&gt;, Vadim Kosin &lt;vkosin@outlook.com&gt;</Authors>
-        <Company>Dmitry Andriyanov &lt;dima117a@gmail.com&gt;, Vadim Kosin &lt;vkosin@outlook.com&gt;</Company>
-        <Copyright>Vadim Kosin 2020</Copyright>
-        <PackageProjectUrl>https://github.com/wadimk/noolite</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/wadimk/noolite.git</RepositoryUrl>
-        <Product>noolite</Product>
-        <PackageTags>core;noolite</PackageTags>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />
-        <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
+        <PackageReference Include="System.IO.Ports" Version="5.0.0" />
     </ItemGroup>
 </Project>

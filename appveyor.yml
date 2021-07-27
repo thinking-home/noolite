@@ -1,12 +1,12 @@
 version: '{build}'
 
-image: Visual Studio 2017 Preview
+image: Visual Studio 2019 Preview
 
 install:
   - dotnet --info
   - dotnet restore
 
 test_script:
-  - dotnet test ./ThinkingHome.NooLite.Tests -c Release -f netcoreapp2.0
+  - dotnet test ./ThinkingHome.NooLite.Tests -c Release -f net5.0
 
-build: off
+build: false

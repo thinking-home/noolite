@@ -1,7 +1,7 @@
 ﻿using System;
+using System.IO.Ports;
 using System.Threading;
 using ThinkingHome.NooLite.Internal;
-using ThinkingHome.NooLite.Ports;
 
 namespace ThinkingHome.NooLite
 {
@@ -60,6 +60,11 @@ namespace ThinkingHome.NooLite
             void TryRead()
             {
                 var bytes = new byte[BUFFER_SIZE];
+
+                if (device.BytesToRead < 0)
+                {
+                    throw new Exception("adapter disconnected");
+                }
 
                 while (device.BytesToRead >= BUFFER_SIZE)
                 {
