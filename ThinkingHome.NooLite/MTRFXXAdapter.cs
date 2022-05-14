@@ -19,7 +19,7 @@ namespace ThinkingHome.NooLite
 
         #region common
 
-        private readonly object lockObject = new object();
+        private readonly object lockObject = new();
 
         private const int READING_INTERVAL = 50;
         private const int BUFFER_SIZE = 17;
@@ -132,9 +132,9 @@ namespace ThinkingHome.NooLite
 
         #region commands: static
 
-        public const byte START_MARKER = 171;
+        private const byte START_MARKER = 171;
 
-        public const byte STOP_MARKER = 172;
+        private const byte STOP_MARKER = 172;
 
         public static byte[] BuildCommand(MTRFXXMode mode, MTRFXXAction action, MTRFXXRepeatCount repeatCount, byte channel,
             MTRFXXCommand command, MTRFXXDataFormat format, byte[] data, UInt32 target = 0)
@@ -145,7 +145,7 @@ namespace ThinkingHome.NooLite
             byte id3 = (byte)(target >> 8);
             byte id4 = (byte)target;
 
-            byte[] d = data ?? new byte[0];
+            byte[] d = data ?? Array.Empty<byte>();
 
             byte d1 = d.Length > 0 ? d[0] : (byte)0;
             byte d2 = d.Length > 1 ? d[1] : (byte)0;
