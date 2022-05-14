@@ -1,7 +1,6 @@
 # ThinkingHome.NooLite
 
-[![Travis](https://img.shields.io/travis/thinking-home/noolite.svg)](https://travis-ci.org/thinking-home/noolite)
-[![AppVeyor](https://img.shields.io/appveyor/ci/dima117/noolite.svg)](https://ci.appveyor.com/project/dima117/noolite)
+[![Build & Tests](https://github.com/thinking-home/noolite/actions/workflows/dotnet.yml/badge.svg)](https://github.com/thinking-home/noolite/actions/workflows/dotnet.yml)
 [![NuGet Pre Release](https://img.shields.io/nuget/vpre/ThinkingHome.NooLite.svg)](https://www.nuget.org/packages/ThinkingHome.NooLite)
 
 Библиотека [ThinkingHome.NooLite](https://www.nuget.org/packages/ThinkingHome.NooLite) предоставляет API для управления устройствами [nooLite](https://www.noo.com.by/sistema-noolite.html) (включая nooLite-F) на платформе .NET Core. Поддерживается работа с адаптером [MTRF-64-USB](https://www.noo.com.by/mtrf-64-usb.html). Поддерживаются операционные системы Windows, MacOS, Linux.
@@ -11,13 +10,13 @@
 Package Manager
 
 ```
-Install-Package ThinkingHome.NooLite -Version 4.0.0
+Install-Package ThinkingHome.NooLite -Version 4.1.0
 ```
 
 .NET CLI
 
 ```
-dotnet add package ThinkingHome.NooLite --version 4.0.0
+dotnet add package ThinkingHome.NooLite --version 4.1.0
 ```
 
 ## Пример использования
