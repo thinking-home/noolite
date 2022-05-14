@@ -19,7 +19,5 @@ jobs:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
     - name: Test
-      run: dotnet test ./ThinkingHome.NooLite.Tests --no-build --verbosity normal -c Release -f net6.0
+      run: dotnet test ./ThinkingHome.NooLite.Tests --no-restore --verbosity normal -c Release -f net6.0
