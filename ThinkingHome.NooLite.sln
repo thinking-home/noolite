@@ -17,6 +17,7 @@ ProjectSection(SolutionItems) = preProject
 	.travis.yml = .travis.yml
 	appveyor.yml = appveyor.yml
 	Package.xml = Package.xml
+	global.json = global.json
 EndProjectSection
 EndProject
 Global
