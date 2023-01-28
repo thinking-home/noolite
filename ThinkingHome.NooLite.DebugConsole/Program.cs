@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO.Ports;
+using System.Threading;
+using ThinkingHome.NooLite.Internal;
 
 namespace ThinkingHome.NooLite.DebugConsole
 {
@@ -12,17 +14,17 @@ namespace ThinkingHome.NooLite.DebugConsole
                 Console.WriteLine(name);
             }
 
-            return;
+            // return;
             //using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AI04XT35"))
-            using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI"))
-            {
-                adapter.Connect += AdapterOnConnect;
-                adapter.Disconnect += AdapterOnDisconnect;
+            using var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI");
+            
+            adapter.Connect += AdapterOnConnect;
+            adapter.Disconnect += AdapterOnDisconnect;
 
-                adapter.ReceiveData += AdapterOnReceiveData;
-                adapter.ReceiveMicroclimateData += AdapterOnReceiveMicroclimateData;
+            adapter.ReceiveData += AdapterOnReceiveData;
+            adapter.ReceiveMicroclimateData += AdapterOnReceiveMicroclimateData;
 
-                adapter.Error += AdapterOnError;
+            adapter.Error += AdapterOnError;
 
 //                Console.WriteLine("open");
 //                adapter.Open();
@@ -36,24 +38,66 @@ namespace ThinkingHome.NooLite.DebugConsole
 //                adapter.Close();
 //                Console.ReadKey();
 
-                Console.WriteLine("open");
-                adapter.Open();
-                Console.ReadKey();
+            Console.WriteLine("open");
+            adapter.Open();
+            Thread.Sleep(100);
 
-                Console.WriteLine("exit service mode");
-                adapter.ExitServiceMode();
-                Console.ReadKey();
+            Console.WriteLine("exit service mode");
+            adapter.ExitServiceMode();
+            Thread.Sleep(100);
+                
+                
+            // Console.WriteLine("bind");
+            // Console.ReadKey();
+            //
+            // adapter.Bind(2);
+                
+            Console.WriteLine("on");
+            adapter.OnF(13);
+            Thread.Sleep(1500);
+            Console.WriteLine("off");
+            adapter.OffF(13);
+            Thread.Sleep(1500);
+            Console.WriteLine("on");
+            adapter.OnF(13);
+            Thread.Sleep(500);
+            Console.WriteLine("off");
+            adapter.OffF(13);
+            Thread.Sleep(500);
+            Console.WriteLine("on");
+            adapter.OnF(13);
+            Thread.Sleep(500);
+            Console.WriteLine("off");
+            adapter.OffF(13);
+            Thread.Sleep(500);
+            Console.WriteLine("done");
 
+            return;
 
-//                Console.WriteLine("bind");
-//                adapter.BindF(13);
-//
-//                Console.ReadKey();
+            for (byte ch = 0; ch < 64; ch++)
+            {
+                Console.WriteLine($@"clear: {ch}");
+                    
+                // adapter.ClearChannel(ch);
+                // adapter.Unbind(ch);
+                // adapter.UnbindF(ch);
+            }
+            // //
+            // return;
 
-//                Console.WriteLine("bind");
-//                adapter.Bind(Mode.NooLiteF, 13);
-//
-//                Console.ReadKey();
+            // Console.WriteLine("prepare bind");
+            // Console.ReadKey();
+            // adapter.BindF(1);
+
+            // Console.WriteLine("bind");
+            // adapter.BindF(13);
+            //
+            // Console.ReadKey();
+            //
+            // Console.WriteLine("bind");
+            // adapter.Bind(Mode.NooLiteF, 13);
+            //
+            // Console.ReadKey();
 
 //
 //                Console.WriteLine("unbind");
@@ -71,25 +115,24 @@ namespace ThinkingHome.NooLite.DebugConsole
 //
 //                Console.ReadKey();
 //
-//                Console.WriteLine("on");
-//                adapter.OnF(13, 2405);
+//                 Console.WriteLine("on");
+//                 adapter.OnF(13, 33347);
 //
-//                Console.ReadKey();
-//
-//                Console.WriteLine("off");
-//                adapter.OffF(13, 2405);
-//
-//                Console.ReadKey();
+//                 Console.ReadKey();
+// //
+//                 Console.WriteLine("off");
+//                 adapter.OffF(13, 33347 );
+
+            // Console.ReadKey();
 
 
-                Console.WriteLine("bind: start");
-                adapter.On(64);
+            Console.WriteLine("switch on");
+            adapter.OnF(0);
 
-                Console.ReadKey();
+            Console.ReadKey();
 
-                Console.WriteLine("bind: stop");
-                adapter.BindStop();
-            }
+            Console.WriteLine("switch off");
+            adapter.OnF(0);
         }
 
         private static void AdapterOnReceiveMicroclimateData(object o, MicroclimateData result)
@@ -115,6 +158,7 @@ namespace ThinkingHome.NooLite.DebugConsole
         private static void AdapterOnReceiveData(object obj, ReceivedData result)
         {
             //var msg = string.Join("=", bytes.Select(b => b.ToString()));
+            Console.WriteLine("data:");
             Console.WriteLine(result);
         }
     }
