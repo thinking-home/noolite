@@ -7,14 +7,6 @@
 
 ## Установка
 
-Package Manager
-
-```
-Install-Package ThinkingHome.NooLite -Version 4.1.0
-```
-
-.NET CLI
-
 ```
 dotnet add package ThinkingHome.NooLite --version 4.1.0
 ```
@@ -201,3 +193,45 @@ void ClearAllChannels()
 ```csharp
 void ExitServiceMode()
 ```
+
+
+## Интерфейс командной строки
+
+Кроме пакета `ThinkingHome.NooLite`, предоставляющего API для управления нагрузкой с помощью адаптера nooLite, доступна утилита `ThinkingHome.NooLite.Console`, которая предоставляет те же самые возможности для управления с помощью интерфейса командной строки.
+
+### Установка
+
+```shell
+$ dotnet tool update --global ThinkingHome.NooLite.Console
+```
+
+### Использование
+
+Вывести список портов на компьютере
+
+```shell
+$ noolite ports
+```
+
+Список доступных команд
+
+```shell
+$ noolite --help
+```
+
+Описание и список параметров конкретной команды
+
+```shell
+# noolite [command] --help
+
+$ noolite set-brightness --help
+```
+
+### Пример использования
+
+Включить нагрузку в канале `13` адаптера, подключенного к порту `/dev/tty.usbserial-AL00HDFI` в режиме `noolite-F`
+
+```shell
+$ noolite on /dev/tty.usbserial-AL00HDFI 13 -f
+```
+
