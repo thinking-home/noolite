@@ -34,6 +34,21 @@ namespace ThinkingHome.NooLite
         }
 
 
+
+        #endregion
+
+        #region read state
+
+        public static void ReadState(this MTRFXXAdapter adapter, byte channel)
+        {
+            throw new NotSupportedException("Not supported in basic mode.");
+        }
+
+        public static void ReadStateF(this MTRFXXAdapter adapter, byte channel, UInt32? deviceId = null)
+        {
+            SendReadState(adapter, channel);
+        }
+
         #endregion
 
         #region brightness
@@ -262,6 +277,11 @@ namespace ThinkingHome.NooLite
 
         #region RX mode
 
+        private static void SendReadState(this MTRFXXAdapter adapter, byte channel)
+        {
+            adapter.SendCommand(MTRFXXMode.TXF, MTRFXXAction.SendCommand, channel, MTRFXXCommand.ReadState);
+        }
+
         public static void BindStart(this MTRFXXAdapter adapter, byte channel)
         {
             adapter.SendCommand(MTRFXXMode.RX, MTRFXXAction.StartBinding, channel, MTRFXXCommand.None);
@@ -287,6 +307,7 @@ namespace ThinkingHome.NooLite
         {
             adapter.SendCommand(MTRFXXMode.Service, MTRFXXAction.SendCommand, 0, MTRFXXCommand.None);
         }
+
 
         #endregion
     }
