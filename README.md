@@ -8,7 +8,7 @@
 ## Установка
 
 ```
-dotnet add package ThinkingHome.NooLite --version 4.1.0
+dotnet add package ThinkingHome.NooLite --version 4.3.0
 ```
 
 ## Пример использования

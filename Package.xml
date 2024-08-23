@@ -1,11 +1,11 @@
 <Project>
     <PropertyGroup>
-        <VersionPrefix>4.2.0</VersionPrefix>
+        <VersionPrefix>4.3.0</VersionPrefix>
 <!--        <VersionSuffix>rc-3-1530995509343</VersionSuffix>-->
 
         <Authors>Dmitry Andriyanov &lt;dima117a@gmail.com&gt;</Authors>
         <NeutralLanguage>en-US</NeutralLanguage>
-        <Copyright>Thinking-Home.RU © 2023</Copyright>
+        <Copyright>Thinking-Home.RU © 2024</Copyright>
 
         <PackageTags>thinking-home;core;noolite</PackageTags>
         <PackageProjectUrl>https://github.com/thinking-home/noolite</PackageProjectUrl>

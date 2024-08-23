@@ -17,7 +17,7 @@ namespace ThinkingHome.NooLite.DebugConsole
             // return;
             //using (var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AI04XT35"))
             using var adapter = new MTRFXXAdapter("/dev/tty.usbserial-AL00HDFI");
-            
+
             adapter.Connect += AdapterOnConnect;
             adapter.Disconnect += AdapterOnDisconnect;
 
@@ -45,13 +45,13 @@ namespace ThinkingHome.NooLite.DebugConsole
             Console.WriteLine("exit service mode");
             adapter.ExitServiceMode();
             Thread.Sleep(100);
-                
-                
+
+
             // Console.WriteLine("bind");
             // Console.ReadKey();
             //
             // adapter.Bind(2);
-                
+
             Console.WriteLine("on");
             adapter.OnF(13);
             Thread.Sleep(1500);
@@ -72,12 +72,10 @@ namespace ThinkingHome.NooLite.DebugConsole
             Thread.Sleep(500);
             Console.WriteLine("done");
 
-            return;
-
             for (byte ch = 0; ch < 64; ch++)
             {
                 Console.WriteLine($@"clear: {ch}");
-                    
+
                 // adapter.ClearChannel(ch);
                 // adapter.Unbind(ch);
                 // adapter.UnbindF(ch);
