@@ -3,14 +3,14 @@
     <PropertyGroup>
         <Description>.NET Core API for the wireless control of appliances using the nooLite system (including nooLite-F mode). Adapter MTRF-64-USB is supported.
 
-http://www.noo.com.by
+https://noo.by/produkcia/sistema-noolite.html
         </Description>
     </PropertyGroup>
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="System.IO.Ports" Version="7.0.0" />
+        <PackageReference Include="System.IO.Ports" Version="8.0.0" />
     </ItemGroup>
 </Project>
