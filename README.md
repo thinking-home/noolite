@@ -3,7 +3,7 @@
 [![Build & Tests](https://github.com/thinking-home/noolite/actions/workflows/dotnet.yml/badge.svg)](https://github.com/thinking-home/noolite/actions/workflows/dotnet.yml)
 [![NuGet Pre Release](https://img.shields.io/nuget/vpre/ThinkingHome.NooLite.svg)](https://www.nuget.org/packages/ThinkingHome.NooLite)
 
-Библиотека [ThinkingHome.NooLite](https://www.nuget.org/packages/ThinkingHome.NooLite) предоставляет API для управления устройствами [nooLite](https://www.noo.com.by/sistema-noolite.html) (включая nooLite-F) на платформе .NET Core. Поддерживается работа с адаптером [MTRF-64-USB](https://www.noo.com.by/mtrf-64-usb.html). Поддерживаются операционные системы Windows, MacOS, Linux.
+Библиотека [ThinkingHome.NooLite](https://www.nuget.org/packages/ThinkingHome.NooLite) предоставляет API для управления устройствами [nooLite](https://noo.by/produkcia/sistema-noolite.html) (включая nooLite-F) на платформе .NET Core. Поддерживается работа с адаптером [MTRF-64-USB](https://noo.by/adapter-mtrf-64-usb-a.html). Поддерживаются операционные системы Windows, MacOS, Linux.
 
 ## Установка
 
@@ -234,4 +234,12 @@ $ noolite set-brightness --help
 ```shell
 $ noolite on /dev/tty.usbserial-AL00HDFI 13 -f
 ```
+
+## Дополнительно
+
+Примеры использования API адаптера MTRF-64-USB с сайта производителя:
+
+1. [Привязка устройства к адаптеру](https://noo.by/uroki/s-urok-1-privyazka-ustrojstva-noolite-f-k-adapteru-mtrf-64-usb.html)
+2. [Чтение ответа от устройства](https://noo.by/uroki/s-urok-2-chtenie-otveta-ot-ustrojstva.html)
+3. [Отправка команды на установку яркости по ID устройства](https://noo.by/uroki/s-urok-3-otpravka-komandy-na-ustanovku-yarkosti-po-id-ustrojstva.html)
 
