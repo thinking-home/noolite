@@ -1,19 +1,18 @@
-﻿namespace ThinkingHome.NooLite.Internal
+﻿namespace ThinkingHome.NooLite.Internal;
+
+public enum MTRFXXDataFormat : byte
 {
-    public enum MTRFXXDataFormat : byte
-    {
-        NoData = 0x00,
+    NoData = 0x00,
 
-        OneByteData = 0x01,
+    OneByteData = 0x01,
 
-        FourByteData = 0x03,
+    FourByteData = 0x03,
 
-        LED = 0x04,
+    LED = 0x04,
 
-        TemporarySwitchOnOneByte = 0x05,
+    TemporarySwitchOnOneByte = 0x05,
 
-        TemporarySwitchOnTwoBytes = 0x06,
+    TemporarySwitchOnTwoBytes = 0x06,
 
-        MicroclimateData = 0x07
-    }
+    MicroclimateData = 0x07
 }

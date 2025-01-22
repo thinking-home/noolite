@@ -3,7 +3,10 @@
 [![Build & Tests](https://github.com/thinking-home/noolite/actions/workflows/dotnet.yml/badge.svg)](https://github.com/thinking-home/noolite/actions/workflows/dotnet.yml)
 [![NuGet Pre Release](https://img.shields.io/nuget/vpre/ThinkingHome.NooLite.svg)](https://www.nuget.org/packages/ThinkingHome.NooLite)
 
-Библиотека [ThinkingHome.NooLite](https://www.nuget.org/packages/ThinkingHome.NooLite) предоставляет API для управления устройствами [nooLite](https://www.noo.com.by/sistema-noolite.html) (включая nooLite-F) на платформе .NET Core. Поддерживается работа с адаптером [MTRF-64-USB](https://www.noo.com.by/mtrf-64-usb.html). Поддерживаются операционные системы Windows, MacOS, Linux.
+Библиотека [ThinkingHome.NooLite](https://www.nuget.org/packages/ThinkingHome.NooLite) предоставляет API для управления
+устройствами [nooLite](https://www.noo.com.by/sistema-noolite.html) (включая nooLite-F) на платформе .NET Core.
+Поддерживается работа с адаптером [MTRF-64-USB](https://www.noo.com.by/mtrf-64-usb.html). Поддерживаются операционные
+системы Windows, MacOS, Linux.
 
 ## Установка
 
@@ -76,7 +79,8 @@ private static void AdapterOnError(object obj, Exception ex)
 
 ### Управление нагрузкой
 
-> Перечисленные ниже методы управляют нагрузкой в стандартном режиме nooLite (без шифрования и обратной связи). Для каждого метода доступен аналогичный метод с суффиксом `F`, который отправляет ту же команду в режиме nooLite-F.
+> Перечисленные ниже методы управляют нагрузкой в стандартном режиме nooLite (без шифрования и обратной связи). Для
+> каждого метода доступен аналогичный метод с суффиксом `F`, который отправляет ту же команду в режиме nooLite-F.
 
 Включить:
 
@@ -194,10 +198,11 @@ void ClearAllChannels()
 void ExitServiceMode()
 ```
 
-
 ## Интерфейс командной строки
 
-Кроме пакета `ThinkingHome.NooLite`, предоставляющего API для управления нагрузкой с помощью адаптера nooLite, доступна утилита `ThinkingHome.NooLite.Console`, которая предоставляет те же самые возможности для управления с помощью интерфейса командной строки.
+Кроме пакета `ThinkingHome.NooLite`, предоставляющего API для управления нагрузкой с помощью адаптера nooLite, доступна
+утилита `ThinkingHome.NooLite.Console`, которая предоставляет те же самые возможности для управления с помощью
+интерфейса командной строки.
 
 ### Установка
 

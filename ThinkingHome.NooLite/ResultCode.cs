@@ -1,13 +1,12 @@
-﻿namespace ThinkingHome.NooLite
+﻿namespace ThinkingHome.NooLite;
+
+public enum ResultCode
 {
-    public enum ResultCode
-    {
-        Success = 0,
-        
-        NoResponse = 1,
-        
-        Error = 2,
-        
-        BindComplete = 3
-    }
+    Success = 0,
+
+    NoResponse = 1,
+
+    Error = 2,
+
+    BindComplete = 3
 }

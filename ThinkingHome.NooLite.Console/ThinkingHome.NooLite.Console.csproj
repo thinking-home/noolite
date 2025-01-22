@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="../Package.xml" />
+    <Import Project="../Package.xml"/>
     <PropertyGroup>
         <Description>Command line interface for the wireless control of appliances using the nooLite system (including nooLite-F mode). Adapter MTRF-64-USB is supported.
 
-http://www.noo.com.by
+            http://www.noo.com.by
         </Description>
     </PropertyGroup>
 
@@ -14,9 +14,9 @@ http://www.noo.com.by
         <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
+        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1"/>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\ThinkingHome.NooLite\ThinkingHome.NooLite.csproj" />
+        <ProjectReference Include="..\ThinkingHome.NooLite\ThinkingHome.NooLite.csproj"/>
     </ItemGroup>
 </Project>

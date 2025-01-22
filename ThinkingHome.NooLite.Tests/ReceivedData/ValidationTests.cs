@@ -1,54 +1,53 @@
 ﻿using System;
 using Xunit;
 
-namespace ThinkingHome.NooLite.Tests.ReceivedData
+namespace ThinkingHome.NooLite.Tests.ReceivedData;
+
+public class ValidationTests
 {
-    public class ValidationTests
+    public const int VALID_DATA_SIZE = 17;
+
+    [Fact]
+    public void Constructor_ForNull_ThrowsException()
     {
-        public const int VALID_DATA_SIZE = 17;
-        
-        [Fact]
-        public void Constructor_ForNull_ThrowsException()
-        {
-            byte[] nullReceivedData = null;
+        byte[] nullReceivedData = null;
 
-            Exception ex = Assert.ThrowsAny<Exception>(() => new NooLite.ReceivedData(nullReceivedData));
-            
-            Assert.Contains("null", ex.Message);
-        }
+        var ex = Assert.ThrowsAny<Exception>(() => new NooLite.ReceivedData(nullReceivedData));
 
-        [Fact]
-        public void Constructor_ForInvalidDataSize_ThrowsException()
-        {
-            byte[] invalidSizeData = new byte[3];
+        Assert.Contains("null", ex.Message);
+    }
 
-            Exception ex = Assert.ThrowsAny<Exception>(() => new NooLite.ReceivedData(invalidSizeData));
-            
-            Assert.Contains("length", ex.Message);
-        }
+    [Fact]
+    public void Constructor_ForInvalidDataSize_ThrowsException()
+    {
+        var invalidSizeData = new byte[3];
 
-        
-        [Fact]
-        public void Constructor_ForInvalidFirstByte_ThrowsException()
-        {
-            byte[] testData = new byte[VALID_DATA_SIZE];
-            testData[0] = 124;
+        var ex = Assert.ThrowsAny<Exception>(() => new NooLite.ReceivedData(invalidSizeData));
 
-            Exception ex = Assert.ThrowsAny<Exception>(() => new NooLite.ReceivedData(testData));
-            
-            Assert.Contains("start", ex.Message);
-        }
+        Assert.Contains("length", ex.Message);
+    }
 
-        [Fact]
-        public void Constructor_ForInvalidLastByte_ThrowsException()
-        {
-            byte[] testData = new byte[VALID_DATA_SIZE];
-            testData[0] = 173;    // valid start marker
-            testData[VALID_DATA_SIZE - 1] = 124;
 
-            Exception ex = Assert.ThrowsAny<Exception>(() => new NooLite.ReceivedData(testData));
-            
-            Assert.Contains("stop", ex.Message);
-        }
+    [Fact]
+    public void Constructor_ForInvalidFirstByte_ThrowsException()
+    {
+        var testData = new byte[VALID_DATA_SIZE];
+        testData[0] = 124;
+
+        var ex = Assert.ThrowsAny<Exception>(() => new NooLite.ReceivedData(testData));
+
+        Assert.Contains("start", ex.Message);
+    }
+
+    [Fact]
+    public void Constructor_ForInvalidLastByte_ThrowsException()
+    {
+        var testData = new byte[VALID_DATA_SIZE];
+        testData[0] = 173; // valid start marker
+        testData[VALID_DATA_SIZE - 1] = 124;
+
+        var ex = Assert.ThrowsAny<Exception>(() => new NooLite.ReceivedData(testData));
+
+        Assert.Contains("stop", ex.Message);
     }
 }
