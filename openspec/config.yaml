@@ -1,0 +1,41 @@
+schema: spec-driven
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+context: |
+  ThinkingHome.NooLite — .NET-библиотека управления устройствами nooLite / nooLite-F через
+  адаптер MTRF-64-USB (System.IO.Ports, 9600, 17-байтные пакеты). Проекты: библиотека
+  (NuGet ThinkingHome.NooLite), Console (dotnet tool `noolite`), DebugConsole, Tests (xUnit + FakeItEasy).
+  Сейчас net9.0, версия 4.4; публикуется в NuGet; CI — GitHub Actions (build & tests).
+
+  Потребитель: драйвер NooLite для хаба ThinkingHome.DeviceModel (репозиторий D:\Source\device-model),
+  подключает библиотеку как NuGet-зависимость. Требования потребителя, факты протокола MTRF-64
+  и разделение ответственности библиотека/драйвер — в docs/device-model-handoff.md (читать первым).
+
+  Ответственность библиотеки: обновление до .NET 10, потокобезопасная отправка пакетов, обёртки
+  Read_State/Send_State (разбор FMT=0), async-приём входящих пакетов. НЕ в библиотеке:
+  корреляция запрос↔ответ, очередь команд, реконнект, модель устройств — это драйвер.
+
+  Коммиты и документация — на русском языке.
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing
