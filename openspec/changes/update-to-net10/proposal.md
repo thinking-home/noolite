@@ -21,13 +21,15 @@ net10.0. Заодно накопился долг по зависимостям:
 
 - `System.IO.Ports` 9.0.1 → 10.0.11.
 - `McMaster.Extensions.CommandLineUtils` 4.1.1 → 5.1.0 (**мажор**).
-- `Microsoft.NET.Test.Sdk` 17.12.0 → 18.3.0 (**мажор**).
-- `xunit.runner.visualstudio` 3.0.1 → 4.0.0 (**мажор**).
-- `xunit` 2.9.3 → `xunit.v3` 4.0.0 — **смена пакета, не версии**: 2.9.3 уже последняя версия
-  пакета `xunit`, актуальное поколение живёт под другим id. Тест-проект становится исполняемым
-  (`OutputType=Exe`).
 - `.github/workflows/dotnet.yml`: `dotnet-version: 10.0.x`, `-f net10.0`,
   `actions/checkout` v3 → v7, `actions/setup-dotnet` v2 → v6.
+
+**Тестовые пакеты не обновляются** (решение владельца, принято по факту реализации): остаются
+`xunit` 2.9.3, `xunit.runner.visualstudio` 3.0.1, `Microsoft.NET.Test.Sdk` 17.12.0. Переезд на
+`xunit.v3` был выполнен и откачен — он тянет за собой смену платформы запуска тестов на
+Microsoft.Testing.Platform, секцию `test` в `global.json`, переписывание CI-команды и риск
+обнаружения тестов в Rider. Подробности и замер — в `design.md` → Decision 3. Переезд выносится
+в отдельный change.
 
 **Удаление неиспользуемого**
 

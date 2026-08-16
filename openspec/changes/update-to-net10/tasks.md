@@ -4,111 +4,118 @@
 
 ## 1. Подготовка окружения
 
-- [ ] 1.1 Зафиксировать исходное состояние: `dotnet --list-sdks`, `dotnet --list-runtimes`,
+- [x] 1.1 Зафиксировать исходное состояние: `dotnet --list-sdks`, `dotnet --list-runtimes`,
       текущие TFM и версии пакетов
-- [ ] 1.2 Обновить `global.json`: `sdk.version` → `10.0.100`, добавить `"rollForward": "latestFeature"`
+- [x] 1.2 Обновить `global.json`: `sdk.version` → `10.0.100`, добавить `"rollForward": "latestFeature"`
       (design → Decision 2)
-- [ ] 1.3 Проверить, что `dotnet --version` в корне репозитория резолвится (ожидается 10.0.400)
-- [ ] 1.4 **[совместно]** Установить .NET 9 **Runtime** (`Microsoft.NETCore.App 9.0.x`); SDK 9
+- [x] 1.3 Проверить, что `dotnet --version` в корне репозитория резолвится (ожидается 10.0.400)
+- [x] 1.4 **[совместно]** Установить .NET 9 **Runtime** (`Microsoft.NETCore.App 9.0.x`); SDK 9
       не нужен. Если рантайм не ставится — отметить это и пропустить группу 2, зафиксировав
       отсутствие baseline в отчёте (design → Risks)
-- [ ] 1.5 Собрать решение на net9.0 под SDK 10 (`dotnet build -c Release`) и прогнать тесты —
+- [x] 1.5 Собрать решение на net9.0 под SDK 10 (`dotnet build -c Release`) и прогнать тесты —
       зафиксировать число тестов и список предупреждений как точку отсчёта
 
 ## 2. Режимы DebugConsole и baseline e2e (ещё на net9.0)
 
-- [ ] 2.1 Переписать `DebugConsole/Program.cs` на режимы: первый аргумент — имя режима, порт /
+- [x] 2.1 Переписать `DebugConsole/Program.cs` на режимы: первый аргумент — имя режима, порт /
       канал / ID — аргументами. Минимум режимов — таблица в design → Decision 6
       (`ports`, `listen`, `on`/`off`/`switch`, `bind`/`unbind`, `bind-rx`, `clear`/`clear-all`)
-- [ ] 2.2 Во всех режимах, работающих с адаптером, подписаться на `Connect`/`Disconnect`/`Error`/
+- [x] 2.2 Во всех режимах, работающих с адаптером, подписаться на `Connect`/`Disconnect`/`Error`/
       `ReceiveData`/`ReceiveMicroclimateData` и печатать все входящие пакеты
-- [ ] 2.3 Разбор аргументов — вручную, без добавления `McMaster` в отладочный проект; при
+- [x] 2.3 Разбор аргументов — вручную, без добавления `McMaster` в отладочный проект; при
       неверных аргументах печатать список режимов
-- [ ] 2.4 Убедиться, что закомментированные и недостижимые сценарии старого файла покрыты
+- [x] 2.4 Убедиться, что закомментированные и недостижимые сценарии старого файла покрыты
       режимами (привязка, отвязка, очистка каналов, адресная отправка по ID) — ничего не потеряно
-- [ ] 2.5 **[совместно]** Baseline e2e, связь: `listen` на реальном COM-порту — порт открывается,
+- [x] 2.5 **[совместно]** Baseline e2e, связь: `listen` на реальном COM-порту — порт открывается,
       после `ExitServiceMode` приходит ответный пакет. Записать вывод
-- [ ] 2.6 **[совместно]** Baseline e2e, управление: `on` и `off` на канале силового блока —
+- [x] 2.6 **[совместно]** Baseline e2e, управление: `on` и `off` на канале силового блока —
       блок физически переключается. Записать вывод и номер канала / режим (F или не-F)
-- [ ] 2.7 **[совместно]** Baseline e2e, приём: в режиме `listen` дождаться пакета от датчика
+- [x] 2.7 **[совместно]** Baseline e2e, приём: в режиме `listen` дождаться пакета от датчика
       (`Sens_Temp_Humi` / микроклимат). Записать вывод, MODE пакета и ID устройства
-- [ ] 2.8 Сохранить весь вывод baseline в отчёт change'а — с ним будет сравниваться прогон
+- [x] 2.8 Сохранить весь вывод baseline в отчёт change'а — с ним будет сравниваться прогон
       после переезда
 
 ## 3. Смена целевой платформы
 
-- [ ] 3.1 `TargetFramework` → `net10.0` в `ThinkingHome.NooLite/ThinkingHome.NooLite.csproj`
-- [ ] 3.2 `TargetFramework` → `net10.0` в `ThinkingHome.NooLite.Console/ThinkingHome.NooLite.Console.csproj`
-- [ ] 3.3 `TargetFramework` → `net10.0` в `ThinkingHome.NooLite.DebugConsole/ThinkingHome.NooLite.DebugConsole.csproj`
-- [ ] 3.4 `TargetFramework` → `net10.0` в `ThinkingHome.NooLite.Tests/ThinkingHome.NooLite.Tests.csproj`
-- [ ] 3.5 Промежуточная зелёная точка: `dotnet build -c Release` + `dotnet test` на **старых**
+- [x] 3.1 `TargetFramework` → `net10.0` в `ThinkingHome.NooLite/ThinkingHome.NooLite.csproj`
+- [x] 3.2 `TargetFramework` → `net10.0` в `ThinkingHome.NooLite.Console/ThinkingHome.NooLite.Console.csproj`
+- [x] 3.3 `TargetFramework` → `net10.0` в `ThinkingHome.NooLite.DebugConsole/ThinkingHome.NooLite.DebugConsole.csproj`
+- [x] 3.4 `TargetFramework` → `net10.0` в `ThinkingHome.NooLite.Tests/ThinkingHome.NooLite.Tests.csproj`
+- [x] 3.5 Промежуточная зелёная точка: `dotnet build -c Release` + `dotnet test` на **старых**
       версиях пакетов; зафиксировать результат и новые предупреждения (design → Decision 7)
-- [ ] 3.6 Если сборка падает — починить только то, что ломает компиляцию под net10.0
+- [x] 3.6 Если сборка падает — починить только то, что ломает компиляцию под net10.0
+      (не потребовалось: сборка прошла без ошибок и предупреждений)
 
 ## 4. Обновление зависимостей
 
-- [ ] 4.1 `System.IO.Ports` 9.0.1 → 10.0.11 в библиотеке; сборка + тесты
-- [ ] 4.2 `McMaster.Extensions.CommandLineUtils` 4.1.1 → 5.1.0 в `Console`; сборка;
+- [x] 4.1 `System.IO.Ports` 9.0.1 → 10.0.11 в библиотеке; сборка + тесты
+- [x] 4.2 `McMaster.Extensions.CommandLineUtils` 4.1.1 → 5.1.0 в `Console`; сборка;
       при поломке — чинить `Console/Program.cs`, зафиксировав, что именно изменилось
       (design → Decision 4)
-- [ ] 4.3 `xunit` 2.9.3 → `xunit.v3` 4.0.0 в тестах: заменить `PackageReference`, добавить
-      `<OutputType>Exe</OutputType>`; прогнать тесты
-- [ ] 4.4 Если правки в тестовых файлах выходят за косметические — откатиться на `xunit` 2.9.3,
-      вынести переезд в отдельный change и зафиксировать причину (design → Risks)
-- [ ] 4.5 `xunit.runner.visualstudio` 3.0.1 → 4.0.0; прогнать тесты
-- [ ] 4.6 `Microsoft.NET.Test.Sdk` 17.12.0 → 18.3.0 (последним в тестовом стеке); проверить, что
-      число обнаруженных тестов не уменьшилось и код возврата корректен
-- [ ] 4.7 Если 4.6 сломался — откатиться на `Microsoft.NET.Test.Sdk` 17.14.1, записать причину
+- [x] 4.3 `xunit` 2.9.3 → `xunit.v3` 4.0.0 в тестах: заменить `PackageReference`, добавить
+      `<OutputType>Exe</OutputType>`; прогнать тесты — **выполнено и откачено**, см. 4.4
+- [x] 4.4 Если правки в тестовых файлах выходят за косметические — откатиться на `xunit` 2.9.3,
+      вынести переезд в отдельный change и зафиксировать причину (design → Risks).
+      **Откат выполнен по решению владельца**: правок в тестах не потребовалось вовсе, но переезд
+      тянет за собой смену платформы запуска (MTP v2), секцию `test` в `global.json`, переписывание
+      CI-команды и риск обнаружения тестов в Rider. Тестовый стек остаётся на VSTest
+- [x] 4.5 ~~`xunit.runner.visualstudio` 3.0.1 → 4.0.0~~ — **отменено** решением владельца
+      («тестовые пакеты не обновлять»); остаётся 3.0.1
+- [x] 4.6 ~~`Microsoft.NET.Test.Sdk` 17.12.0 → 18.3.0~~ — **отменено** тем же решением;
+      остаётся 17.12.0
+- [x] 4.7 ~~Откат `Microsoft.NET.Test.Sdk` на 17.14.1~~ — не требуется, 4.6 не выполнялась
 
 ## 5. Удаление неиспользуемого
 
-- [ ] 5.1 Удалить `PackageReference` на `FakeItEasy` из `.Tests.csproj`; прогнать тесты
-- [ ] 5.2 Удалить `<AllowUnsafeBlocks>` из `ThinkingHome.NooLite.csproj`; сборка
-- [ ] 5.3 Убрать дублирующуюся строку `<PackageRequireLicenseAcceptance>` в `Package.xml`
-- [ ] 5.4 `Package.xml`: год в `Copyright` → 2026; `VersionPrefix` **не трогать** (остаётся 4.4.0)
+- [x] 5.1 Удалить `PackageReference` на `FakeItEasy` из `.Tests.csproj`; прогнать тесты
+- [x] 5.2 Удалить `<AllowUnsafeBlocks>` из `ThinkingHome.NooLite.csproj`; сборка
+- [x] 5.3 Убрать дублирующуюся строку `<PackageRequireLicenseAcceptance>` в `Package.xml`
+- [x] 5.4 `Package.xml`: год в `Copyright` → 2026; `VersionPrefix` **не трогать** (остаётся 4.4.0)
 
 ## 6. Сборка и тесты
 
-- [ ] 6.1 `dotnet build -c Release` по всему решению — без ошибок
-- [ ] 6.2 `dotnet test ./ThinkingHome.NooLite.Tests -c Release` — все тесты зелёные, число тестов
+- [x] 6.1 `dotnet build -c Release` по всему решению — без ошибок
+- [x] 6.2 `dotnet test ./ThinkingHome.NooLite.Tests -c Release` — все тесты зелёные, число тестов
       не меньше зафиксированного в 1.5
-- [ ] 6.3 Сравнить предупреждения с зафиксированными в 1.5 и 3.5; новые — устранить либо явно
+- [x] 6.3 Сравнить предупреждения с зафиксированными в 1.5 и 3.5; новые — устранить либо явно
       перечислить в отчёте как принятые
 
 ## 7. Проверка dotnet tool `noolite`
 
-- [ ] 7.1 `dotnet pack ./ThinkingHome.NooLite.Console -c Release -o <папка>` — пакет собирается
-- [ ] 7.2 `dotnet tool install --global --add-source <папка> ThinkingHome.NooLite.Console` — ставится
-- [ ] 7.3 `noolite --help` — выводит справку со списком команд и версией (проверка `McMaster` 5.x)
-- [ ] 7.4 `noolite ports` — выводит список COM-портов (проверка `System.IO.Ports` 10.x)
-- [ ] 7.5 `dotnet tool uninstall --global ThinkingHome.NooLite.Console` — машина возвращена
+- [x] 7.1 `dotnet pack ./ThinkingHome.NooLite.Console -c Release -o <папка>` — пакет собирается
+- [x] 7.2 `dotnet tool install --global --add-source <папка> ThinkingHome.NooLite.Console` — ставится
+- [x] 7.3 `noolite --help` — выводит справку со списком команд и версией (проверка `McMaster` 5.x)
+- [x] 7.4 `noolite ports` — выводит список COM-портов (проверка `System.IO.Ports` 10.x)
+- [x] 7.5 `dotnet tool uninstall --global ThinkingHome.NooLite.Console` — машина возвращена
       в исходное состояние
 
 ## 8. E2E на живом адаптере после переезда
 
-- [ ] 8.1 **[совместно]** Связь: `listen` на том же COM-порту — порт открывается, после
+- [x] 8.1 **[совместно]** Связь: `listen` на том же COM-порту — порт открывается, после
       `ExitServiceMode` приходит ответный пакет
-- [ ] 8.2 **[совместно]** Управление: `on` / `off` на том же канале и в том же режиме, что
+- [x] 8.2 **[совместно]** Управление: `on` / `off` на том же канале и в том же режиме, что
       в 2.6 — блок физически переключается
-- [ ] 8.3 **[совместно]** Приём: в режиме `listen` дождаться пакета от того же датчика
-- [ ] 8.4 Сравнить вывод 8.1–8.3 с baseline из 2.8: MODE, CTR, TOGL, ID и разбор данных должны
+- [x] 8.3 **[совместно]** Приём: в режиме `listen` дождаться пакета от того же датчика
+- [x] 8.4 Сравнить вывод 8.1–8.3 с baseline из 2.8: MODE, CTR, TOGL, ID и разбор данных должны
       совпадать. Любое расхождение — разобрать до причины, а не списать на «шум»
-- [ ] 8.5 Если baseline отсутствует (пропущена группа 2) — зафиксировать, что e2e прошёл без
-      точки сравнения, и перечислить, что именно проверялось
+- [x] 8.5 ~~Если baseline отсутствует~~ — не требуется, baseline снят в группе 2
 
 ## 9. CI
 
-- [ ] 9.1 `.github/workflows/dotnet.yml`: `dotnet-version` → `10.0.x`, шаг test → `-f net10.0`
-- [ ] 9.2 `actions/checkout` v3 → v7, `actions/setup-dotnet` v2 → v6
+- [x] 9.1 `.github/workflows/dotnet.yml`: `dotnet-version` → `10.0.x`, шаг test → `-f net10.0`
+- [x] 9.2 `actions/checkout` v3 → v7, `actions/setup-dotnet` v2 → v6
 - [ ] 9.3 Отдельным коммитом запушить изменения CI и дождаться зелёного workflow
+      — **не выполнено**: коммит и пуш остаются за владельцем. Учесть, что workflow триггерится
+      только на `master` (push / PR), поэтому пуша ветки `update-to-net10` недостаточно
 - [ ] 9.4 Если workflow падает на мажорах actions — откатить проблемный action на предыдущий
-      мажор и зафиксировать причину
+      мажор и зафиксировать причину — **не выполнено**, зависит от 9.3
 
 ## 10. Завершение
 
-- [ ] 10.1 Сверить с `docs/device-model-handoff.md` → раздел «1. Обновление до .NET 10»:
+- [x] 10.1 Сверить с `docs/device-model-handoff.md` → раздел «1. Обновление до .NET 10»:
       все пункты закрыты (кроме `VersionPrefix` — по решению остаётся 4.4.0) либо явно отклонены
-- [ ] 10.2 Проверить `README.md` и прочие документы на упоминания .NET 9 / net9.0 и обновить;
+- [x] 10.2 Проверить `README.md` и прочие документы на упоминания .NET 9 / net9.0 и обновить;
       описать режимы `DebugConsole`, если он где-то документирован
-- [ ] 10.3 Отчёт по приёмке: результаты 6.1–6.2, 7.3–7.4, 8.4, 9.3; список принятых отклонений
+      (в README упоминаний версии нет, DebugConsole не документирован — правок не потребовалось)
+- [x] 10.3 Отчёт по приёмке: результаты 6.1–6.2, 7.3–7.4, 8.4, 9.3; список принятых отклонений
       (откаты пакетов, оставшиеся предупреждения, пропущенные шаги)

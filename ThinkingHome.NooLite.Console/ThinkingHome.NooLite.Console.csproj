@@ -11,10 +11,10 @@
         <OutputType>Exe</OutputType>
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>noolite</ToolCommandName>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1"/>
+        <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="5.1.0"/>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\ThinkingHome.NooLite\ThinkingHome.NooLite.csproj"/>
