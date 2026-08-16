@@ -24,6 +24,10 @@ public class MTRFXXAdapter : IDisposable
     private const int READING_INTERVAL = 50;
     private const int BUFFER_SIZE = 17;
 
+    // запись выполняется под тем же lockObject, что и чтение по таймеру,
+    // поэтому бесконечное ожидание на записи остановило бы приём пакетов
+    private const int WRITE_TIMEOUT = 500;
+
     private readonly SerialPort device;
     private readonly Timer timer;
 
@@ -47,7 +51,7 @@ public class MTRFXXAdapter : IDisposable
 
     public MTRFXXAdapter(string portName)
     {
-        device = new SerialPort(portName, 9600);
+        device = new SerialPort(portName, 9600) { WriteTimeout = WRITE_TIMEOUT };
         timer = new Timer(TimerCallback, null, Timeout.Infinite, READING_INTERVAL);
     }
 
@@ -117,7 +121,14 @@ public class MTRFXXAdapter : IDisposable
         byte[] data = null, uint target = 0)
     {
         var cmd = BuildCommand(mode, action, repeatCount, channel, command, format, data, target);
-        device.Write(cmd, 0, cmd.Length);
+
+        // пакет пишется под общим замком целиком: параллельные вызовы не должны
+        // перемешать байты. ошибки намеренно не перехватываются - вызывающей стороне
+        // нужно достоверно знать, ушла команда или нет
+        lock (lockObject)
+        {
+            device.Write(cmd, 0, cmd.Length);
+        }
     }
 
     #endregion
