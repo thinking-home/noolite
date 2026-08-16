@@ -16,6 +16,7 @@ internal class Program
         public byte Channel { get; set; }
         public bool ModeF { get; set; }
         public uint? DeviceId { get; set; }
+        public byte Format { get; set; }
     }
 
     private static int Main(string[] args)
@@ -66,6 +67,11 @@ internal class Program
 
                 case "bind-rx":
                     return BindRxMode(ParseOptions(args, true));
+
+                case "state":
+                    // Read_State - команда двусторонней связи, режим F подразумевается
+                    return CommandMode(ParseOptions(args, true),
+                        (a, o) => a.ReadStateF(o.Channel, o.DeviceId, o.Format));
 
                 default:
                     Console.Error.WriteLine($"unknown mode: {args[0]}");
@@ -130,6 +136,8 @@ internal class Program
         adapter.Error += AdapterOnError;
         adapter.ReceiveData += AdapterOnReceiveData;
         adapter.ReceiveMicroclimateData += AdapterOnReceiveMicroclimateData;
+        adapter.ReceivePowerUnitState += AdapterOnReceivePowerUnitState;
+        adapter.ReceiveStateFormatError += AdapterOnReceiveStateFormatError;
 
         Console.WriteLine($"open {options.Port}");
         adapter.Open();
@@ -200,6 +208,16 @@ internal class Program
         Console.WriteLine($"microclimate: {result}");
     }
 
+    private static void AdapterOnReceivePowerUnitState(object obj, PowerUnitStateData result)
+    {
+        Console.WriteLine($"power unit state: {result}");
+    }
+
+    private static void AdapterOnReceiveStateFormatError(object obj, StateFormatErrorData result)
+    {
+        Console.WriteLine($"state format error: {result}");
+    }
+
     #endregion
 
     #region arguments
@@ -227,6 +245,14 @@ internal class Program
 
                 options.DeviceId = deviceId;
             }
+            else if (arg == "--fmt")
+            {
+                if (++i >= args.Length) throw new ArgumentException("--fmt requires a value");
+                if (!byte.TryParse(args[i], out var format))
+                    throw new ArgumentException($"invalid format: {args[i]}");
+
+                options.Format = format;
+            }
             else if (channel == null)
             {
                 if (!byte.TryParse(arg, out var value)) throw new ArgumentException($"invalid channel: {arg}");
@@ -251,7 +277,7 @@ internal class Program
         Console.WriteLine(@"
 nooLite adapter debug console.
 
-usage: <mode> [<port> [<channel>]] [-f] [--id <device id>]
+usage: <mode> [<port> [<channel>]] [-f] [--id <device id>] [--fmt <row>]
 
 modes:
   ports                       display the list of the serial ports on this computer
@@ -264,19 +290,25 @@ modes:
   bind-rx <port> <channel>    open the binding window for a sensor (RX mode)
   clear <port> <channel>      clear the channel cell
   clear-all <port>            clear the whole adapter memory
+  state <port> <channel>      request the state of nooLite-F power units (Read_State; -f implied)
 
 options:
   -f                          use the nooLite-F mode
   --id <device id>            send the command to the specified nooLite-F device (requires -f);
                               use '--id 0' to send the broadcast command
+  --fmt <row>                 state table row to request with 'state' (default 0 - main info)
 
-all modes except 'ports' print incoming packets while running.
+all modes except 'ports' print incoming packets while running; parsed power unit state
+(Send_State, FMT 0) and state format errors (FMT 255) are printed separately.
 
 examples:
   listen COM3
   on COM3 13 -f
   off COM3 13 -f --id 1594
-  bind-rx COM3 2");
+  bind-rx COM3 2
+  state COM3 0
+  state COM3 0 --id 33347
+  state COM3 0 --fmt 200");
     }
 
     #endregion

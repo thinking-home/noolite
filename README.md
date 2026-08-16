@@ -34,6 +34,7 @@ static void Main(string[] args)
         // добавляем обработчики входящих команд
         adapter.ReceiveData += AdapterOnReceiveData;
         adapter.ReceiveMicroclimateData += AdapterOnReceiveMicroclimateData;
+        adapter.ReceivePowerUnitState += AdapterOnReceivePowerUnitState;
 
         // обработка ошибок
         adapter.Error += AdapterOnError;
@@ -46,6 +47,10 @@ static void Main(string[] args)
 
         // включение света в 13 канале (nooLite-F)
         adapter.OnF(13);
+
+        // запрос состояния силовых блоков в 13 канале (nooLite-F);
+        // каждый блок ответит пакетом Send_State - придёт в ReceivePowerUnitState
+        adapter.ReadStateF(13);
     }
 }
 
@@ -67,6 +72,11 @@ private static void AdapterOnReceiveData(object obj, ReceivedData result)
 private static void AdapterOnReceiveMicroclimateData(object obj, MicroclimateData result)
 {
     Console.WriteLine($"temperature: {result.Temperature}, humidity: {result.Humidity}");
+}
+
+private static void AdapterOnReceivePowerUnitState(object obj, PowerUnitStateData result)
+{
+    Console.WriteLine($"device {result.DeviceId}: {result.State}, power level: {result.PowerLevel}");
 }
 
 private static void AdapterOnError(object obj, Exception ex)
@@ -197,6 +207,38 @@ void ClearAllChannels()
 ```csharp
 void ExitServiceMode()
 ```
+
+### Состояние силовых блоков (nooLite-F)
+
+Запросить состояние: по каналу (`deviceId = null` — ответят все привязанные к каналу блоки),
+адресно (`deviceId` — 32-битный адрес блока) или широковещательно (`deviceId = 0`). `format` —
+адрес строки таблицы состояния, `0` — основная информация.
+
+```csharp
+void ReadStateF(byte channel, uint? deviceId = null, byte format = 0)
+```
+
+Ответ приходит событиями адаптера:
+
+- `ReceivePowerUnitState` — `PowerUnitStateData` для строки 0: `DeviceType`, `FirmwareVersion`,
+  `State` (`Off` / `On` / `TemporaryOn`), `ServiceMode`, `PowerLevel`. Тип устройства и уровень
+  мощности отдаются как есть, без интерпретации;
+- `ReceiveStateFormatError` — `StateFormatErrorData`, если блок не знает запрошенную строку
+  (ответ с форматом 255);
+- любая другая строка таблицы — только через общее событие `ReceiveData` сырым пакетом.
+
+Блок nooLite-F присылает своё состояние и без запроса — после каждой команды управления
+(`OnF`, `OffF` и т.д.), поэтому `ReceivePowerUnitState` срабатывает чаще, чем вызывается `ReadStateF`.
+
+### Входящие пакеты
+
+Каждый входящий пакет доступен через событие `ReceiveData` как `ReceivedData`. Байт TOGL пакета
+имеет разный смысл в зависимости от режима, поэтому доступен тремя свойствами:
+
+- `Remains` (`int?`) — сколько пакетов ответа ещё придёт; только для режимов TX/TXF, иначе `null`;
+- `ToggleCounter` (`int?`) — счётчик команд передатчика (датчика, пульта): растёт на единицу при
+  каждой новой команде, у повторов одной посылки одинаков; только для режимов RX/RXF, иначе `null`;
+- `Togl` (`byte`) — сырой байт, всегда.
 
 ## Интерфейс командной строки
 

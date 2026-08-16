@@ -267,6 +267,29 @@ public static class MTRFXXAdapterExtensions
 
     #endregion
 
+    #region state
+
+    /// <summary>
+    /// Запросить состояние блоков nooLite-F. Ответ приходит пакетом Send_State от каждого
+    /// ответившего блока: при <paramref name="format"/> = 0 — событием
+    /// <see cref="MTRFXXAdapter.ReceivePowerUnitState"/>, при неизвестной блоку строке —
+    /// <see cref="MTRFXXAdapter.ReceiveStateFormatError"/>, иначе — только через
+    /// <see cref="MTRFXXAdapter.ReceiveData"/>.
+    /// </summary>
+    /// <param name="channel">Канал адаптера.</param>
+    /// <param name="deviceId">
+    /// <c>null</c> — запрос по каналу, ответят все привязанные блоки;
+    /// адрес блока — адресный запрос, ответит только он;
+    /// 0 — широковещательный запрос, после которого адаптер сам опросит блоки канала.
+    /// </param>
+    /// <param name="format">Адрес строки таблицы состояния; 0 — основная информация.</param>
+    public static void ReadStateF(this MTRFXXAdapter adapter, byte channel, uint? deviceId = null, byte format = 0)
+    {
+        SendData(adapter, MTRFXXCommand.ReadState, true, channel, deviceId, (MTRFXXDataFormat)format);
+    }
+
+    #endregion
+
     #region RX mode
 
     public static void BindStart(this MTRFXXAdapter adapter, byte channel)

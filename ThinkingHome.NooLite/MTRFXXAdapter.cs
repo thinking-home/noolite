@@ -11,6 +11,20 @@ public class MTRFXXAdapter : IDisposable
 
     public event Action<object, ReceivedData> ReceiveData;
     public event Action<object, MicroclimateData> ReceiveMicroclimateData;
+
+    /// <summary>
+    /// Пришла основная информация о состоянии блока nooLite-F (Send_State, FMT=0).
+    /// Срабатывает не только в ответ на <c>ReadStateF</c>: блок присылает своё состояние
+    /// после любой команды в режиме TXF (On, Off, Bind и т.д.).
+    /// </summary>
+    public event Action<object, PowerUnitStateData> ReceivePowerUnitState;
+
+    /// <summary>
+    /// Блок nooLite-F ответил ошибкой формата на запрос состояния (Send_State, FMT=255) —
+    /// запрошена несуществующая строка таблицы состояния.
+    /// </summary>
+    public event Action<object, StateFormatErrorData> ReceiveStateFormatError;
+
     public event Action<object> Connect;
     public event Action<object> Disconnect;
     public event Action<object, Exception> Error;
@@ -77,6 +91,15 @@ public class MTRFXXAdapter : IDisposable
                     {
                         var microclimateData = new MicroclimateData(bytes);
                         ReceiveMicroclimateData?.Invoke(this, microclimateData);
+                    }
+                    else if (data.Command == MTRFXXCommand.SendState)
+                    {
+                        // типизируются только известные форматы; прочие строки таблицы
+                        // состояния доходят до потребителя лишь через ReceiveData
+                        if (data.DataFormat == PowerUnitStateData.MAIN_INFO_FORMAT)
+                            ReceivePowerUnitState?.Invoke(this, new PowerUnitStateData(bytes));
+                        else if (data.DataFormat == StateFormatErrorData.ERROR_FORMAT)
+                            ReceiveStateFormatError?.Invoke(this, new StateFormatErrorData(bytes));
                     }
                 }
         }

@@ -34,7 +34,30 @@ public class ReceivedData
 
     public ResultCode Result => (ResultCode)data[2];
 
-    public int Remains => (Mode == MTRFXXMode.RX) | (Mode == MTRFXXMode.RXF) ? 0 : data[3];
+    private bool IsTx => Mode is MTRFXXMode.TX or MTRFXXMode.TXF;
+
+    private bool IsRx => Mode is MTRFXXMode.RX or MTRFXXMode.RXF;
+
+    /// <summary>
+    /// Сырой байт TOGL (байт 3 пакета), без интерпретации. Смысл зависит от режима:
+    /// для TX/TXF см. <see cref="Remains"/>, для RX/RXF — <see cref="ToggleCounter"/>.
+    /// Для сервисного режима и режима обновления ПО семантика байта руководством не описана —
+    /// это единственный способ его прочитать.
+    /// </summary>
+    public byte Togl => data[3];
+
+    /// <summary>
+    /// Сколько пакетов ответа адаптер ещё передаст после этого (последний пакет серии — 0).
+    /// Осмысленно только для режимов TX и TXF; для остальных — <c>null</c>.
+    /// </summary>
+    public int? Remains => IsTx ? data[3] : null;
+
+    /// <summary>
+    /// Счётчик команд передатчика: увеличивается на единицу при каждой новой команде,
+    /// у повторов одной посылки значение одинаковое — по нему отличают новое событие
+    /// от повтора. Осмысленно только для режимов RX и RXF; для остальных — <c>null</c>.
+    /// </summary>
+    public int? ToggleCounter => IsRx ? data[3] : null;
 
     public int Channel => data[4];
 
@@ -64,7 +87,11 @@ public class ReceivedData
 
     public override string ToString()
     {
-        return $"mode: {Mode}, command: {Command}, result: {Result}, channel: {Channel}, remains: {Remains} " +
+        var togl = IsTx ? $", remains: {Remains}"
+            : IsRx ? $", toggle: {ToggleCounter}"
+            : string.Empty;
+
+        return $"mode: {Mode}, command: {Command}, result: {Result}, channel: {Channel}{togl}, " +
                $"fmt: {DataFormat}, data: [{Data1}, {Data2}, {Data3}, {Data4}], device ID: {DeviceId}";
     }
 

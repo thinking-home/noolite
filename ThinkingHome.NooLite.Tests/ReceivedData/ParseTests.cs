@@ -30,15 +30,59 @@ public class ParseTests
         Assert.Equal(ResultCode.NoResponse, data.Result);
     }
 
-    [Fact]
-    public void Parse_Remains_IsCorrect()
+    [Theory]
+    [InlineData(0, 133)] // TX
+    [InlineData(2, 133)] // TXF
+    public void Parse_Togl_ForTxModes_IsRemains(byte mode, byte togl)
     {
-        const byte REMAINS_TEST_VALUE = 133;
-        var bytes = H.GetBytes().Set(3, REMAINS_TEST_VALUE);
+        var bytes = H.GetBytes().Set(1, mode).Set(3, togl);
 
         var data = new NooLite.ReceivedData(bytes);
 
-        Assert.Equal(REMAINS_TEST_VALUE, data.Remains);
+        Assert.Equal(togl, data.Togl);
+        Assert.Equal((int?)togl, data.Remains);
+        Assert.Null(data.ToggleCounter);
+    }
+
+    [Theory]
+    [InlineData(1, 137)] // RX
+    [InlineData(3, 137)] // RXF
+    public void Parse_Togl_ForRxModes_IsToggleCounter(byte mode, byte togl)
+    {
+        var bytes = H.GetBytes().Set(1, mode).Set(3, togl);
+
+        var data = new NooLite.ReceivedData(bytes);
+
+        Assert.Equal(togl, data.Togl);
+        Assert.Null(data.Remains);
+        Assert.Equal((int?)togl, data.ToggleCounter);
+    }
+
+    [Theory]
+    [InlineData(4)] // Service
+    [InlineData(5)] // Update
+    public void Parse_Togl_ForOtherModes_IsRawOnly(byte mode)
+    {
+        const byte TOGL_TEST_VALUE = 42;
+        var bytes = H.GetBytes().Set(1, mode).Set(3, TOGL_TEST_VALUE);
+
+        var data = new NooLite.ReceivedData(bytes);
+
+        Assert.Equal(TOGL_TEST_VALUE, data.Togl);
+        Assert.Null(data.Remains);
+        Assert.Null(data.ToggleCounter);
+    }
+
+    [Fact]
+    public void Parse_Togl_ForRepeatedRxPackets_IsSame()
+    {
+        const byte RX_MODE = 1;
+        const byte TOGL_TEST_VALUE = 7;
+
+        var first = new NooLite.ReceivedData(H.GetBytes().Set(1, RX_MODE).Set(3, TOGL_TEST_VALUE));
+        var repeat = new NooLite.ReceivedData(H.GetBytes().Set(1, RX_MODE).Set(3, TOGL_TEST_VALUE));
+
+        Assert.Equal(first.ToggleCounter, repeat.ToggleCounter);
     }
 
     [Fact]

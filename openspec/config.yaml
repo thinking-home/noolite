@@ -5,16 +5,27 @@ schema: spec-driven
 context: |
   ThinkingHome.NooLite — .NET-библиотека управления устройствами nooLite / nooLite-F через
   адаптер MTRF-64-USB (System.IO.Ports, 9600, 17-байтные пакеты). Проекты: библиотека
-  (NuGet ThinkingHome.NooLite), Console (dotnet tool `noolite`), DebugConsole, Tests (xUnit + FakeItEasy).
-  Сейчас net9.0, версия 4.4; публикуется в NuGet; CI — GitHub Actions (build & tests).
+  (NuGet ThinkingHome.NooLite), Console (dotnet tool `noolite`, McMaster.Extensions.CommandLineUtils),
+  DebugConsole (отладочная консоль с режимами ports/listen/on/off/bind/bind-rx/clear и др.),
+  Tests (xUnit 2.9 + VSTest, 18 тестов на разбор пакетов). net10.0, версия пакета 4.4.0
+  (не менялась после переезда); публикуется в NuGet; CI — GitHub Actions (build & tests).
 
   Потребитель: драйвер NooLite для хаба ThinkingHome.DeviceModel (репозиторий D:\Source\device-model),
   подключает библиотеку как NuGet-зависимость. Требования потребителя, факты протокола MTRF-64
-  и разделение ответственности библиотека/драйвер — в docs/device-model-handoff.md (читать первым).
+  и разделение ответственности библиотека/драйвер — в docs/device-model-handoff.md (читать первым;
+  раздел «1. Обновление до .NET 10» и пункт «2. Потокобезопасность отправки» уже выполнены).
 
-  Ответственность библиотеки: обновление до .NET 10, потокобезопасная отправка пакетов, обёртки
-  Read_State/Send_State (разбор FMT=0), async-приём входящих пакетов. НЕ в библиотеке:
-  корреляция запрос↔ответ, очередь команд, реконнект, модель устройств — это драйвер.
+  Сделано (архив openspec/changes/archive/): переезд на .NET 10 (2026-08-16-update-to-net10);
+  атомарная запись пакета под общим замком + WriteTimeout 500 мс (2026-08-16-thread-safe-send).
+  Основная спека: openspec/specs/command-sending/spec.md.
+
+  Осталось из handoff: обёртки Read_State/Send_State (разбор FMT=0), async-приём входящих
+  пакетов. НЕ в библиотеке: корреляция запрос↔ответ, очередь команд, реконнект, модель
+  устройств — это драйвер.
+
+  Живое железо для e2e: адаптер на COM3, реле SUF-1-300 (nooLite-F, ID 33347) на канале 0,
+  датчик PT-111 на канале 1. Наблюдения с железа и открытые хвосты (Remains=0 для RX,
+  тип устройства SUF-1-300 = 5, откаченный шов над SerialPort) — в архивных report.md.
 
   Коммиты и документация — на русском языке.
 
