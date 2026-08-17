@@ -157,6 +157,9 @@ internal class Program
         action(adapter);
 
         Console.WriteLine("done");
+        if (adapter.DroppedPacketsCount > 0)
+            Console.WriteLine($"dropped packets: {adapter.DroppedPacketsCount}");
+
         return 0;
     }
 

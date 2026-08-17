@@ -6,26 +6,38 @@ context: |
   ThinkingHome.NooLite — .NET-библиотека управления устройствами nooLite / nooLite-F через
   адаптер MTRF-64-USB (System.IO.Ports, 9600, 17-байтные пакеты). Проекты: библиотека
   (NuGet ThinkingHome.NooLite), Console (dotnet tool `noolite`, McMaster.Extensions.CommandLineUtils),
-  DebugConsole (отладочная консоль с режимами ports/listen/on/off/bind/bind-rx/clear и др.),
-  Tests (xUnit 2.9 + VSTest, 18 тестов на разбор пакетов). net10.0, версия пакета 4.4.0
-  (не менялась после переезда); публикуется в NuGet; CI — GitHub Actions (build & tests).
+  DebugConsole (отладочная консоль с режимами ports/listen/on/off/bind/bind-rx/clear/state и др.),
+  Tests (xUnit 2.9 + VSTest, 35 тестов — только разбор байтов). net10.0, версия пакета 4.4.0
+  (не менялась; код содержит ломающее изменение Remains: int → int?, мажор владелец делает сам);
+  публикуется в NuGet; CI — GitHub Actions (build & tests).
 
   Потребитель: драйвер NooLite для хаба ThinkingHome.DeviceModel (репозиторий D:\Source\device-model),
-  подключает библиотеку как NuGet-зависимость. Требования потребителя, факты протокола MTRF-64
-  и разделение ответственности библиотека/драйвер — в docs/device-model-handoff.md (читать первым;
-  раздел «1. Обновление до .NET 10» и пункт «2. Потокобезопасность отправки» уже выполнены).
+  подключает библиотеку как NuGet-зависимость. Исходный контекст, факты протокола MTRF-64
+  и разделение ответственности библиотека/драйвер — в docs/device-model-handoff.md (исторический
+  документ 2026-08-14; все три его пункта выполнены).
 
-  Сделано (архив openspec/changes/archive/): переезд на .NET 10 (2026-08-16-update-to-net10);
-  атомарная запись пакета под общим замком + WriteTimeout 500 мс (2026-08-16-thread-safe-send).
-  Основная спека: openspec/specs/command-sending/spec.md.
+  Устройство адаптера (MTRFXXAdapter): таймер каждые 50 мс под lockObject читает 17-байтные
+  пакеты из порта и кладёт сырые байты в Channel<byte[]> (bounded, по умолчанию 128, DropWrite —
+  новое при переполнении отбрасывается, DroppedPacketsCount); один фоновый диспетчер вне замка разбирает и вызывает события ReceiveData →
+  типизированные (ReceiveMicroclimateData, ReceivePowerUnitState, ReceiveStateFormatError) по одному
+  и в порядке прихода, обработчики изолированы (исключение → Error). SendCommand пишет под тем же
+  lockObject, WriteTimeout 500 мс. Close() — порт закрыт сразу, очередь отброшена, Disconnect;
+  FlushAndCloseAsync — порт закрыт сразу, ждёт доставки остатка, Disconnect; Dispose = Close.
+  Байт TOGL: Togl (сырой), Remains (int?, TX/TXF), ToggleCounter (int?, RX/RXF).
 
-  Осталось из handoff: обёртки Read_State/Send_State (разбор FMT=0), async-приём входящих
-  пакетов. НЕ в библиотеке: корреляция запрос↔ответ, очередь команд, реконнект, модель
-  устройств — это драйвер.
+  Сделано (архив openspec/changes/archive/): 2026-08-16-update-to-net10, 2026-08-16-thread-safe-send,
+  2026-08-16-read-state, async-receive. Основные спеки: openspec/specs/command-sending,
+  openspec/specs/packet-receiving.
+
+  НЕ в библиотеке: корреляция запрос↔ответ, очередь команд, реконнект, модель устройств — драйвер.
+
+  Известное ограничение: юнит-тестов на адаптер (замок, диспетчер, закрытие) нет — SerialPort
+  создаётся в конструкторе, шва нет. Схема шва и теста на конкурентную запись — в архивном
+  2026-08-16-thread-safe-send/report.md; проверки диспетчера на железе — в async-receive/report.md.
 
   Живое железо для e2e: адаптер на COM3, реле SUF-1-300 (nooLite-F, ID 33347) на канале 0,
-  датчик PT-111 на канале 1. Наблюдения с железа и открытые хвосты (Remains=0 для RX,
-  тип устройства SUF-1-300 = 5, откаченный шов над SerialPort) — в архивных report.md.
+  датчик PT-111 на канале 1. SUF-1-300 отдаёт тип устройства 5 и D3=255 при включении
+  (справка для -A даёт 9 и 100 — константы из справки на железе не сходятся).
 
   Коммиты и документация — на русском языке.
 
