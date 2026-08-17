@@ -17,8 +17,8 @@ context: |
   документ 2026-08-14; все три его пункта выполнены).
 
   Устройство адаптера (MTRFXXAdapter): таймер каждые 50 мс под lockObject читает 17-байтные
-  пакеты из порта и кладёт сырые байты в Channel<byte[]> (bounded, по умолчанию 128, DropOldest,
-  DroppedPacketsCount); один фоновый диспетчер вне замка разбирает и вызывает события ReceiveData →
+  пакеты из порта и кладёт сырые байты в Channel<byte[]> (bounded, по умолчанию 128, DropWrite —
+  новое при переполнении отбрасывается, DroppedPacketsCount); один фоновый диспетчер вне замка разбирает и вызывает события ReceiveData →
   типизированные (ReceiveMicroclimateData, ReceivePowerUnitState, ReceiveStateFormatError) по одному
   и в порядке прихода, обработчики изолированы (исключение → Error). SendCommand пишет под тем же
   lockObject, WriteTimeout 500 мс. Close() — порт закрыт сразу, очередь отброшена, Disconnect;

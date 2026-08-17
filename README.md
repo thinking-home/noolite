@@ -261,8 +261,8 @@ void ReadStateF(byte channel, uint? deviceId = null, byte format = 0)
   обрабатываются как обычно.
 
 Очередь ограничена — по умолчанию 128 пакетов, задаётся вторым параметром конструктора
-`MTRFXXAdapter(portName, queueCapacity)`. При переполнении отбрасывается самый старый пакет;
-число отброшенных — в свойстве `DroppedPacketsCount`.
+`MTRFXXAdapter(portName, queueCapacity)`. При переполнении новый пакет отбрасывается, уже
+принятые сохраняются в порядке прихода; число отброшенных — в свойстве `DroppedPacketsCount`.
 
 #### Закрытие
 

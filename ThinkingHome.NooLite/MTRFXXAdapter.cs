@@ -90,8 +90,9 @@ public class MTRFXXAdapter : IDisposable
 
     /// <param name="portName">Имя последовательного порта адаптера.</param>
     /// <param name="queueCapacity">
-    /// Ёмкость очереди принятых пакетов. При переполнении отбрасывается самый старый пакет,
-    /// число отброшенных доступно через <see cref="DroppedPacketsCount"/>.
+    /// Ёмкость очереди принятых пакетов. При переполнении новый пакет отбрасывается, очередь
+    /// сохраняет уже принятые в порядке прихода; число отброшенных доступно через
+    /// <see cref="DroppedPacketsCount"/>.
     /// </param>
     public MTRFXXAdapter(string portName, int queueCapacity = DEFAULT_QUEUE_CAPACITY)
     {
@@ -102,10 +103,13 @@ public class MTRFXXAdapter : IDisposable
         device = new SerialPort(portName, 9600) { WriteTimeout = WRITE_TIMEOUT };
         timer = new Timer(TimerCallback, null, Timeout.Infinite, READING_INTERVAL);
 
+        // при переполнении отбрасывается НОВЫЙ пакет (DropWrite): очередь отдаёт пакеты
+        // в порядке прихода, и вытеснять уже принятые ради новых нечестно - в очереди могут
+        // лежать пакеты от разных устройств, новый не "обновляет" старый, а теряет чужое событие
         queue = Channel.CreateBounded<byte[]>(
             new BoundedChannelOptions(queueCapacity)
             {
-                FullMode = BoundedChannelFullMode.DropOldest,
+                FullMode = BoundedChannelFullMode.DropWrite,
                 SingleReader = true,
                 SingleWriter = false
             },
