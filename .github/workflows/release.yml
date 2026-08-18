@@ -1,0 +1,65 @@
+name: Release
+
+# Публикация в NuGet запускается только вручную: Actions -> Release -> Run workflow.
+# Версия вводится руками и сверяется с Package.xml: выложенный в NuGet пакет удалить нельзя,
+# поэтому запуск должен быть осознанным.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Версия для публикации, должна совпадать с VersionPrefix в Package.xml (например, 5.0.0)'
+        required: true
+
+# два одновременных релиза недопустимы
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write  # выпуск OIDC-токена для Trusted Publishing
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v7
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v6
+      with:
+        dotnet-version: 10.0.x
+    - name: Check branch and version
+      env:
+        REQUESTED_VERSION: ${{ inputs.version }}
+        REF_NAME: ${{ github.ref_name }}
+      run: |
+        if [ "$REF_NAME" != "master" ]; then
+          echo "::error::релиз выпускается только из master, а запуск был из $REF_NAME"
+          exit 1
+        fi
+        ACTUAL=$(sed -n 's:.*<VersionPrefix>::p' Package.xml | sed 's:</VersionPrefix>.*::' | head -1)
+        echo "Package.xml: $ACTUAL, запрошено: $REQUESTED_VERSION"
+        if [ "$ACTUAL" != "$REQUESTED_VERSION" ]; then
+          echo "::error::версия в Package.xml ($ACTUAL) не совпадает с запрошенной ($REQUESTED_VERSION)"
+          exit 1
+        fi
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Test
+      run: dotnet test ./ThinkingHome.NooLite.Tests --no-restore --verbosity normal -c Release -f net10.0
+    - name: Pack
+      run: dotnet pack ThinkingHome.NooLite.sln --no-restore -c Release -o artifacts
+    # короткоживущий ключ действует 1 час - получаем его непосредственно перед публикацией
+    - name: NuGet login
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: ${{ secrets.NUGET_USER }}
+    - name: Push
+      run: >
+        dotnet nuget push "artifacts/*.nupkg"
+        --api-key ${{ steps.login.outputs.NUGET_API_KEY }}
+        --source https://api.nuget.org/v3/index.json
+        --skip-duplicate

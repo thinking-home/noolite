@@ -7,10 +7,10 @@ context: |
   адаптер MTRF-64-USB (System.IO.Ports, 9600, 17-байтные пакеты). Проекты: библиотека
   (NuGet ThinkingHome.NooLite), Console (dotnet tool `noolite`, McMaster.Extensions.CommandLineUtils),
   DebugConsole (отладочная консоль с режимами ports/listen/on/off/bind/bind-rx/clear/state и др.),
-  Tests (xUnit 2.9 + VSTest, 73 теста: 35 на разбор байтов + 38 на адаптер через подставной
-  порт). net10.0, версия пакета 4.4.0
-  (не менялась; код содержит ломающее изменение Remains: int → int?, мажор владелец делает сам);
-  публикуется в NuGet; CI — GitHub Actions (build & tests).
+  Tests (xUnit 2.9 + VSTest, 76 тестов). net10.0, версия пакета 5.0.0 (мажорный релиз 2026-08-18,
+  коммит «релиз 5»); публикуется в NuGet; CI — GitHub Actions (build & tests).
+  История изменений и указания по миграции — CHANGELOG.md (ведётся с 5.0.0, формат
+  Keep a Changelog, на русском; версии ниже 5.0.0 не восстанавливались).
 
   Потребитель: драйвер NooLite для хаба ThinkingHome.DeviceModel (репозиторий D:\Source\device-model),
   подключает библиотеку как NuGet-зависимость. Исходный контекст, факты протокола MTRF-64
@@ -33,10 +33,26 @@ context: |
   closing/inFlight/drained удалены). Байт TOGL: Togl (сырой), Remains (int?, TX/TXF),
   ToggleCounter (int?, RX/RXF).
 
+  Утилита noolite (Console): каркас InvokeAsync(port, Action<MTRFXXAdapter>) — Open → ExitServiceMode →
+  Task.Delay(50) → команда → Task.Delay(100) → FlushAndCloseAsync, всё внутри using. Паузы нужны,
+  чтобы адаптер успел отправить в эфир: FlushAndCloseAsync закрывает порт немедленно и дожидается
+  только уже принятого, он паузу НЕ заменяет. Ошибки открытия порта библиотека отдаёт событием Error,
+  а не исключением, поэтому каркас подписывается на Error и после Open проверяет IsOpened; ошибки
+  после отправки — предупреждение в stderr, код возврата не портят. Аргументы помечены IsRequired(),
+  OnValidationError печатает справку своей команды. Main — async Task<int>, один try вокруг
+  ExecuteAsync: CommandParsingException → сообщение + справка + 1, прочее → сообщение без стека + 1.
+  19 команд, паритет с публичным API отправки; bind-start / bind-stop / clear-channel / clear-all
+  работают только в режиме RX и НЕ имеют флага -f (в библиотеке нет F-вариантов), у bind-stop
+  и clear-all нет и канала. Команд чтения (state, listen) в утилите сознательно нет.
+  Версия — из AssemblyInformationalVersionAttribute с отсечением «+<sha>»; в Package.xml
+  выставлен IncludeSourceRevisionInInformationalVersion=false.
+
   Сделано (архив openspec/changes/archive/): 2026-08-16-update-to-net10, 2026-08-16-thread-safe-send,
   2026-08-16-read-state, 2026-08-18-async-receive, 2026-08-18-port-abstraction,
-  2026-08-18-dispatcher-lifecycle. Основные спеки:
-  openspec/specs/command-sending, openspec/specs/packet-receiving.
+  2026-08-18-dispatcher-lifecycle, 2026-08-18-release-5-0. Основные спеки:
+  openspec/specs/command-sending, openspec/specs/packet-receiving, openspec/specs/cli
+  (последняя описывает контракт утилиты: набор команд, форма аргументов, коды возврата,
+  завершение без отбрасывания принятого).
 
   НЕ в библиотеке: корреляция запрос↔ответ, очередь команд, реконнект, модель устройств — драйвер.
 
@@ -47,7 +63,8 @@ context: |
   коллекция "adapter" без параллелизма). Тесты адаптера ждут сигналов с таймаутом 5 с, не спят.
   76 тестов (35 разбор + 41 адаптер). Прежний краевой случай «типизированное событие после
   Disconnect» ИСПРАВЛЕН в dispatcher-lifecycle (постоянный тест
-  Close_DuringHandler_TypedEventDeliveredBeforeDisconnect).
+  Close_DuringHandler_TypedEventDeliveredBeforeDisconnect). Утилита автотестами НЕ покрыта —
+  проверяется справкой и дымовым прогоном на живом железе.
 
   Живое железо для e2e: адаптер на COM3, реле SUF-1-300 (nooLite-F, ID 33347) на канале 0,
   датчик PT-111 на канале 1. SUF-1-300 отдаёт тип устройства 5 и D3=255 при включении

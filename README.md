@@ -16,6 +16,7 @@ dotnet add package ThinkingHome.NooLite
 
 Перечень изменений между версиями и указания по переходу на новую мажорную версию —
 в [CHANGELOG.md](CHANGELOG.md).
+Процедура выпуска новой версии — в [docs/releasing.md](docs/releasing.md).
 
 ## Пример использования
 
