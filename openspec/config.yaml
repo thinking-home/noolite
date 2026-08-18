@@ -7,8 +7,9 @@ context: |
   адаптер MTRF-64-USB (System.IO.Ports, 9600, 17-байтные пакеты). Проекты: библиотека
   (NuGet ThinkingHome.NooLite), Console (dotnet tool `noolite`, McMaster.Extensions.CommandLineUtils),
   DebugConsole (отладочная консоль с режимами ports/listen/on/off/bind/bind-rx/clear/state и др.),
-  Tests (xUnit 2.9 + VSTest, 76 тестов). net10.0, версия пакета 5.0.0 (мажорный релиз 2026-08-18,
-  коммит «релиз 5»); публикуется в NuGet; CI — GitHub Actions (build & tests).
+  Tests (xUnit 2.9 + VSTest, 76 тестов). net10.0, версия пакета 5.0.0: оба пакета опубликованы
+  в NuGet 2026-08-18, установка Console как dotnet tool из NuGet проверена на живом железе.
+  CI — GitHub Actions: dotnet.yml (build & tests на push и PR) и release.yml (публикация).
   История изменений и указания по миграции — CHANGELOG.md (ведётся с 5.0.0, формат
   Keep a Changelog, на русском; версии ниже 5.0.0 не восстанавливались).
 
@@ -46,6 +47,18 @@ context: |
   и clear-all нет и канала. Команд чтения (state, listen) в утилите сознательно нет.
   Версия — из AssemblyInformationalVersionAttribute с отсечением «+<sha>»; в Package.xml
   выставлен IncludeSourceRevisionInInformationalVersion=false.
+
+  Релизная автоматизация: .github/workflows/release.yml, запуск ТОЛЬКО вручную (workflow_dispatch
+  с вводом версии), публикация обоих пакетов через Trusted Publishing — OIDC-обмен на временный
+  ключ (действует 1 час), долгоживущего API-ключа нет нигде. До сборки проверяется, что запуск
+  из master и что введённая версия совпадает с VersionPrefix в Package.xml; push идёт
+  с --skip-duplicate, concurrency: release. Политика Trusted Publishing на nuget.org привязана
+  к ИМЕНИ ФАЙЛА воркфлоу — переименование release.yml сломает публикацию. Имя пользователя
+  nuget.org хранится в NUGET_USER на вкладке Variables (это не секрет: владелец пакета и так
+  виден публично), воркфлоу читает vars.NUGET_USER || secrets.NUGET_USER — первая публикация
+  упала именно на том, что читался только secrets. Тегов и GitHub Releases не делаем,
+  environment с подтверждением не заводили: гейт — сам ручной запуск.
+  Процедура выпуска — docs/releasing.md.
 
   Сделано (архив openspec/changes/archive/): 2026-08-16-update-to-net10, 2026-08-16-thread-safe-send,
   2026-08-16-read-state, 2026-08-18-async-receive, 2026-08-18-port-abstraction,
