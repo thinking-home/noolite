@@ -26,12 +26,21 @@
 
 Переименование `release.yml` сломает публикацию — политику придётся заводить заново.
 
-### 2. Секрет `NUGET_USER` в репозитории
+### 2. `NUGET_USER` в репозитории
 
-Settings → Secrets and variables → Actions → New repository secret:
+Settings → Secrets and variables → Actions:
 
 - имя: `NUGET_USER`
 - значение: **имя пользователя** на nuget.org (profile name), **не** адрес электронной почты
+
+Годится любая из двух вкладок — воркфлоу читает `vars.NUGET_USER`, а если пусто, то
+`secrets.NUGET_USER`. По смыслу это **не секрет**: имя владельца пакета и так видно на его
+странице в nuget.org, поэтому вкладка **Variables** уместнее.
+
+Частая ошибка: значение заведено на вкладке Variables, а воркфлоу читает только `secrets.*` —
+`NuGet/login` падает с `Input required and not supplied: user`. Вторая частая причина той же
+ошибки — значение заведено на уровне организации `thinking-home` с политикой доступа
+«Selected repositories», в которую не включён `noolite`.
 
 ## Как выпустить релиз
 
