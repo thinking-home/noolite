@@ -62,22 +62,30 @@ public class LifecycleTests
     }
 
     /// <summary>
-    /// Что: <c>Close()</c> закрывает порт, сбрасывает <c>IsOpened</c> и вызывает <c>Disconnect</c> ровно один раз.
+    /// Что: <c>Close()</c> закрывает порт синхронно и вызывает <c>Disconnect</c> ровно один раз —
+    /// но <b>асинхронно</b>, из потока диспетчера (событие ждём через сигнал, не сразу после вызова).
     /// Контекст: открытый адаптер с пустой очередью.
     /// </summary>
     [Fact]
-    public void Close_RaisesDisconnect_AndClosesPort()
+    public async Task Close_RaisesDisconnect_AndClosesPort()
     {
         var port = new FakeSerialDevice();
         using var adapter = new NooLite.MTRFXXAdapter(port);
         var disconnects = 0;
-        adapter.Disconnect += _ => disconnects++;
+        var disconnected = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        adapter.Disconnect += _ =>
+        {
+            disconnects++;
+            disconnected.TrySetResult();
+        };
         adapter.Open();
 
         adapter.Close();
 
         Assert.False(adapter.IsOpened);
         Assert.False(port.IsOpen);
+        await Wait.For(disconnected.Task, "Disconnect");
+        await Task.Delay(Wait.Grace);
         Assert.Equal(1, disconnects);
     }
 

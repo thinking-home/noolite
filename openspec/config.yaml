@@ -22,12 +22,20 @@ context: |
   новое при переполнении отбрасывается, DroppedPacketsCount); один фоновый диспетчер вне замка разбирает и вызывает события ReceiveData →
   типизированные (ReceiveMicroclimateData, ReceivePowerUnitState, ReceiveStateFormatError) по одному
   и в порядке прихода, обработчики изолированы (исключение → Error). SendCommand пишет под тем же
-  lockObject, WriteTimeout 500 мс. Close() — порт закрыт сразу, очередь отброшена, Disconnect;
-  FlushAndCloseAsync — порт закрыт сразу, ждёт доставки остатка, Disconnect; Dispose = Close.
-  Байт TOGL: Togl (сырой), Remains (int?, TX/TXF), ToggleCounter (int?, RX/RXF).
+  lockObject, WriteTimeout 500 мс. Закрытием владеет диспетчер: Close/FlushAndCloseAsync/Dispose
+  под замком закрывают порт и стоп-таймер, затем публикуют один запрос pendingClose (CloseRequest
+  {Drain, Done}) и будят диспетчер сентинелом WAKE; диспетчер отбрасывает/доставляет остаток
+  и вызывает Disconnect. Close()/Dispose() — Disconnect АСИНХРОННЫЙ (порт закрыт по возврату,
+  событие вскоре из потока доставки, не ждём); Close() из обработчика безопасен. FlushAndCloseAsync
+  — ждёт доставки остатка, Disconnect, затем возврат; из обработчика — InvalidOperationException.
+  Disconnect последний по построению: начатый пакет доигрывается целиком (вкл. типизированные),
+  потом Disconnect. Полей жизненного цикла два: pendingClose + insideHandler (прежние
+  closing/inFlight/drained удалены). Байт TOGL: Togl (сырой), Remains (int?, TX/TXF),
+  ToggleCounter (int?, RX/RXF).
 
   Сделано (архив openspec/changes/archive/): 2026-08-16-update-to-net10, 2026-08-16-thread-safe-send,
-  2026-08-16-read-state, 2026-08-18-async-receive, 2026-08-18-port-abstraction. Основные спеки:
+  2026-08-16-read-state, 2026-08-18-async-receive, 2026-08-18-port-abstraction,
+  2026-08-18-dispatcher-lifecycle. Основные спеки:
   openspec/specs/command-sending, openspec/specs/packet-receiving.
 
   НЕ в библиотеке: корреляция запрос↔ответ, очередь команд, реконнект, модель устройств — драйвер.
@@ -37,9 +45,9 @@ context: |
   обёртка над SerialPort (9600, WriteTimeout 500). В Tests: FakeSerialDevice (Feed / журнал записи
   по байту с Yield / FailRead / FailWrite), AdapterTestKit (Packets, Wait, EventLog, Gate,
   коллекция "adapter" без параллелизма). Тесты адаптера ждут сигналов с таймаутом 5 с, не спят.
-  Известный краевой случай (не исправлен, решение владельца): Close() во время обработчика
-  ReceiveData → типизированное событие того же пакета приходит после Disconnect
-  (см. report.md change'а port-abstraction, раздел «Находки»).
+  76 тестов (35 разбор + 41 адаптер). Прежний краевой случай «типизированное событие после
+  Disconnect» ИСПРАВЛЕН в dispatcher-lifecycle (постоянный тест
+  Close_DuringHandler_TypedEventDeliveredBeforeDisconnect).
 
   Живое железо для e2e: адаптер на COM3, реле SUF-1-300 (nooLite-F, ID 33347) на канале 0,
   датчик PT-111 на канале 1. SUF-1-300 отдаёт тип устройства 5 и D3=255 при включении

@@ -59,9 +59,10 @@ public class CloseTests
     /// <summary>
     /// Что: <c>Close()</c> при непустой очереди закрывает порт сразу, вызывает <c>Disconnect</c>,
     /// а P2, P3 до обработчиков не доходят — ни до, ни после отпускания обработчика P1.
-    /// Контекст: P1 в обработчике, P2, P3 в очереди; после <c>Disconnect</c> обработчик отпускается
-    /// и выдерживается пауза — журнал должен остаться «data:1, disconnect».
-    /// Спека: packet-receiving → «Немедленное закрытие с непустой очередью».
+    /// Контекст: P1 в обработчике, P2, P3 в очереди. По возврату <c>Close()</c> порт закрыт, но
+    /// <c>Disconnect</c> ещё НЕ вызван — он приходит из потока диспетчера только после того, как
+    /// начатый пакет P1 доигран (отпущен <see cref="Gate"/>). Затем P2, P3 отброшены.
+    /// Спека: packet-receiving → «Немедленное закрытие с непустой очередью», «…не ждёт отключения».
     /// </summary>
     [Fact]
     public async Task Close_WithPendingPackets_DropsThem_DisconnectIsLast()
@@ -71,11 +72,14 @@ public class CloseTests
 
         s.Adapter.Close();
 
+        // порт закрыт сразу, вызов вернулся; Disconnect не приходит, пока обработчик P1 держит Gate
         Assert.False(s.Port.IsOpen);
         Assert.False(s.Adapter.IsOpened);
-        await Wait.For(s.Disconnected.Task, "Disconnect");
+        await Task.Delay(Wait.Grace);
+        Assert.False(s.Disconnected.Task.IsCompleted);
 
         s.Gate.Release();
+        await Wait.For(s.Disconnected.Task, "Disconnect");
         await Task.Delay(Wait.Grace);
 
         Assert.Equal(new[] { "data:1", "disconnect" }, s.Log.Items);
@@ -130,10 +134,13 @@ public class CloseTests
         cts.Cancel();
 
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => Wait.For(flush, "cancelled flush"));
-        await Wait.For(s.Disconnected.Task, "Disconnect after cancel");
         Assert.False(s.Port.IsOpen);
 
+        // Disconnect приходит из диспетчера после доигровки P1; отмена перевела остаток
+        // в отбрасывание, поэтому P2, P3 не доставляются
+        Assert.False(s.Disconnected.Task.IsCompleted);
         s.Gate.Release();
+        await Wait.For(s.Disconnected.Task, "Disconnect after cancel");
         await Task.Delay(Wait.Grace);
 
         Assert.Equal(new[] { "data:1", "disconnect" }, s.Log.Items);
@@ -177,8 +184,8 @@ public class CloseTests
     /// <summary>
     /// Что: при пустой очереди и простаивающем диспетчере <c>FlushAndCloseAsync()</c> возвращается,
     /// не зависая, и вызывает <c>Disconnect</c>.
-    /// Контекст: ветка «ждать нечего» — сигнала от диспетчера не будет (он спит на
-    /// <c>WaitToReadAsync</c>), метод должен это распознать по <c>Count == 0 &amp;&amp; inFlight == 0</c>.
+    /// Контекст: диспетчер спит на <c>WaitToReadAsync</c>; запрос закрытия и сентинел <c>WAKE</c>
+    /// будят его, он вызывает <c>Disconnect</c> и завершает ожидание.
     /// </summary>
     [Fact]
     public async Task FlushAndClose_WithEmptyQueue_ReturnsAndDisconnects()
@@ -222,12 +229,130 @@ public class CloseTests
 
         s.Adapter.Dispose();
 
+        // как Close: порт закрыт сразу, Disconnect — после доигровки P1
         Assert.False(s.Port.IsOpen);
-        await Wait.For(s.Disconnected.Task, "Disconnect");
+        await Task.Delay(Wait.Grace);
+        Assert.False(s.Disconnected.Task.IsCompleted);
 
         s.Gate.Release();
+        await Wait.For(s.Disconnected.Task, "Disconnect");
         await Task.Delay(Wait.Grace);
 
         Assert.Equal(new[] { "data:1", "disconnect" }, s.Log.Items);
+    }
+
+    /// <summary>
+    /// Что: если <c>Close()</c> вызван, пока выполняется обработчик <c>ReceiveData</c> пакета
+    /// <c>Send_State</c> FMT 0, типизированное <c>ReceivePowerUnitState</c> того же пакета
+    /// доставляется <b>до</b> <c>Disconnect</c>. Раньше (до этого change'а) типизированное событие
+    /// приходило ПОСЛЕ <c>Disconnect</c> — исправленный краевой случай из
+    /// <c>port-abstraction/report.md</c> § 6.1, теперь постоянный тест.
+    /// Контекст: обработчик <c>ReceiveData</c> держит <see cref="Gate"/>; пока он стоит, тест
+    /// вызывает <c>Close()</c>; после отпускания диспетчер доигрывает пакет целиком, затем закрывает.
+    /// Спека: packet-receiving → «Типизированное событие пакета при закрытии в момент его обработки».
+    /// </summary>
+    [Fact]
+    public async Task Close_DuringHandler_TypedEventDeliveredBeforeDisconnect()
+    {
+        var port = new FakeSerialDevice();
+        using var adapter = new NooLite.MTRFXXAdapter(port);
+        var log = new EventLog();
+        var gate = new Gate();
+        var disconnected = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        adapter.ReceiveData += (_, _) => log.Add("data");
+        adapter.ReceiveData += gate.Handle;
+        adapter.ReceivePowerUnitState += (_, _) => log.Add("state");
+        adapter.Disconnect += _ =>
+        {
+            log.Add("disconnect");
+            disconnected.TrySetResult();
+        };
+        adapter.Open();
+
+        port.Feed(Packets.SendStateFmt0());
+        await gate.WaitStarted();
+
+        adapter.Close();
+        await Task.Delay(Wait.Grace);
+        Assert.False(disconnected.Task.IsCompleted); // пакет ещё доигрывается
+
+        gate.Release();
+        await Wait.For(disconnected.Task, "Disconnect");
+        await Task.Delay(Wait.Grace);
+
+        // типизированное событие того же пакета - ДО disconnect
+        Assert.Equal(new[] { "data", "state", "disconnect" }, log.Items);
+    }
+
+    /// <summary>
+    /// Что: <c>Close()</c> из обработчика события не бросает и не виснет; адаптер закрывается,
+    /// <c>Disconnect</c> — последний, после него событий нет.
+    /// Контекст: обработчик <c>ReceiveData</c> сам вызывает <c>Close()</c> (теперь это безопасно —
+    /// метод публикует запрос и возвращается, ничего не ожидая).
+    /// Спека: packet-receiving → «Немедленное закрытие из обработчика».
+    /// </summary>
+    [Fact]
+    public async Task Close_FromHandler_DoesNotThrowOrHang()
+    {
+        var port = new FakeSerialDevice();
+        using var adapter = new NooLite.MTRFXXAdapter(port);
+        var log = new EventLog();
+        var disconnected = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        Exception thrown = null;
+
+        adapter.ReceiveData += (_, d) =>
+        {
+            log.Add($"data:{d.Data1}");
+            try { adapter.Close(); }
+            catch (Exception ex) { thrown = ex; }
+        };
+        adapter.Disconnect += _ =>
+        {
+            log.Add("disconnect");
+            disconnected.TrySetResult();
+        };
+        adapter.Open();
+
+        port.Feed(Packets.Untyped(1), Packets.Untyped(2));
+        await Wait.For(disconnected.Task, "Disconnect");
+        await Task.Delay(Wait.Grace);
+
+        Assert.Null(thrown);
+        Assert.False(adapter.IsOpened);
+        // P2 отброшен (Close из обработчика P1); disconnect последний
+        Assert.Equal(new[] { "data:1", "disconnect" }, log.Items);
+    }
+
+    /// <summary>
+    /// Что: второй <c>FlushAndCloseAsync()</c>, вызванный пока первый ещё дренирует остаток,
+    /// возвращается сразу без ошибки (порт уже закрыт первым — ветка <c>wasOpen == false</c>);
+    /// первый дожидается доставки остатка; <c>Disconnect</c> вызывается ровно один раз.
+    /// Контекст: раньше общий сигнал <c>drained</c> мог быть затёрт; теперь TCS едет внутри
+    /// запроса закрытия и не разделяется между несогласованными вызовами. P1 в обработчике,
+    /// P2, P3 в очереди.
+    /// </summary>
+    [Fact]
+    public async Task SecondFlushWhileDraining_ReturnsEarly_DisconnectOnce()
+    {
+        using var s = new Setup();
+        await s.ArrangeBlockedWithQueue();
+
+        var disconnects = 0;
+        s.Adapter.Disconnect += _ => Interlocked.Increment(ref disconnects);
+
+        var flush1 = s.Adapter.FlushAndCloseAsync(); // закрывает порт, ждёт остаток
+        var flush2 = s.Adapter.FlushAndCloseAsync(); // порт уже закрыт → ранний возврат
+
+        await Wait.For(flush2, "second FlushAndCloseAsync returns early");
+        Assert.False(flush1.IsCompleted); // первый ещё дренирует (обработчик держит Gate)
+
+        s.Gate.Release();
+        await Wait.For(flush1, "first FlushAndCloseAsync drains");
+        await Task.Delay(Wait.Grace);
+
+        Assert.Equal(new[] { "data:1", "data:2", "data:3", "disconnect" }, s.Log.Items);
+        Assert.Equal(1, Volatile.Read(ref disconnects));
+        Assert.False(s.Adapter.IsOpened);
     }
 }
