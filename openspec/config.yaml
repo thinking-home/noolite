@@ -7,7 +7,8 @@ context: |
   адаптер MTRF-64-USB (System.IO.Ports, 9600, 17-байтные пакеты). Проекты: библиотека
   (NuGet ThinkingHome.NooLite), Console (dotnet tool `noolite`, McMaster.Extensions.CommandLineUtils),
   DebugConsole (отладочная консоль с режимами ports/listen/on/off/bind/bind-rx/clear/state и др.),
-  Tests (xUnit 2.9 + VSTest, 35 тестов — только разбор байтов). net10.0, версия пакета 4.4.0
+  Tests (xUnit 2.9 + VSTest, 73 теста: 35 на разбор байтов + 38 на адаптер через подставной
+  порт). net10.0, версия пакета 4.4.0
   (не менялась; код содержит ломающее изменение Remains: int → int?, мажор владелец делает сам);
   публикуется в NuGet; CI — GitHub Actions (build & tests).
 
@@ -26,14 +27,19 @@ context: |
   Байт TOGL: Togl (сырой), Remains (int?, TX/TXF), ToggleCounter (int?, RX/RXF).
 
   Сделано (архив openspec/changes/archive/): 2026-08-16-update-to-net10, 2026-08-16-thread-safe-send,
-  2026-08-16-read-state, async-receive. Основные спеки: openspec/specs/command-sending,
-  openspec/specs/packet-receiving.
+  2026-08-16-read-state, 2026-08-18-async-receive, 2026-08-18-port-abstraction. Основные спеки:
+  openspec/specs/command-sending, openspec/specs/packet-receiving.
 
   НЕ в библиотеке: корреляция запрос↔ответ, очередь команд, реконнект, модель устройств — драйвер.
 
-  Известное ограничение: юнит-тестов на адаптер (замок, диспетчер, закрытие) нет — SerialPort
-  создаётся в конструкторе, шва нет. Схема шва и теста на конкурентную запись — в архивном
-  2026-08-16-thread-safe-send/report.md; проверки диспетчера на железе — в async-receive/report.md.
+  Тестируемость адаптера: internal-шов над SerialPort — ISerialDevice (7 членов) и internal
+  конструктор MTRFXXAdapter(ISerialDevice, capacity), InternalsVisibleTo для Tests; SerialPortDevice —
+  обёртка над SerialPort (9600, WriteTimeout 500). В Tests: FakeSerialDevice (Feed / журнал записи
+  по байту с Yield / FailRead / FailWrite), AdapterTestKit (Packets, Wait, EventLog, Gate,
+  коллекция "adapter" без параллелизма). Тесты адаптера ждут сигналов с таймаутом 5 с, не спят.
+  Известный краевой случай (не исправлен, решение владельца): Close() во время обработчика
+  ReceiveData → типизированное событие того же пакета приходит после Disconnect
+  (см. report.md change'а port-abstraction, раздел «Находки»).
 
   Живое железо для e2e: адаптер на COM3, реле SUF-1-300 (nooLite-F, ID 33347) на канале 0,
   датчик PT-111 на канале 1. SUF-1-300 отдаёт тип устройства 5 и D3=255 при включении

@@ -5,9 +5,9 @@ namespace ThinkingHome.NooLite.Tests.MTRFXXAdapter;
 
 /// <summary>
 /// Пакет запроса состояния: BuildCommand с аргументами, которые ReadStateF передаёт через
-/// SendData. Сама цепочка ReadStateF → SendData → GetModeAndAction → SendCommand юнит-тестом
-/// не покрыта (нет шва для перехвата записи в порт) — проверяется на живом адаптере.
-/// Здесь — что для заданных MODE/CTR/CMD/FMT/ID пакет собирается корректно.
+/// SendData. Здесь — что для заданных MODE/CTR/CMD/FMT/ID пакет собирается корректно;
+/// сама цепочка ReadStateF → SendData → GetModeAndAction → SendCommand → байты в порту —
+/// в ExtensionsSendTests через подставной порт.
 /// </summary>
 public class ReadStateCommandTests
 {
