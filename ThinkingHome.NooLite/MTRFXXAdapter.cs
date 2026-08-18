@@ -49,21 +49,37 @@ public class MTRFXXAdapter : IDisposable
 
     private int droppedPackets;
 
-    // выставляется Close/FlushAndCloseAsync: диспетчер отбрасывает всё, что вынет после этого,
-    // чтобы ни один обработчик не был вызван после Disconnect
-    private volatile bool closing;
+    // запрос закрытия: null — адаптер работает; не-null — Close/FlushAndCloseAsync опубликовал
+    // запрос, диспетчер обработает его в порядке своей очереди (отбросит/доставит остаток,
+    // вызовет Disconnect). Заменяет прежние closing/inFlight/drained: одно поле вместо трёх,
+    // без межпоточных инвариантов. Пишется через Interlocked/Volatile, читается диспетчером
+    // через Volatile.Read
+    private CloseRequest pendingClose;
+
+    // будильник: Close пишет его в очередь, чтобы разбудить спящий на WaitToReadAsync диспетчер.
+    // корректность от доставки НЕ зависит (при полной очереди DropWrite его отбросит, но тогда
+    // диспетчер и так в цикле чтения и увидит pendingClose) — это только сигнал проснуться
+    private static readonly byte[] WAKE = new byte[0];
 
     // стоит, пока выполняются обработчики событий пакета; течёт через await/Task.Run —
     // так FlushAndCloseAsync узнаёт, что его позвали изнутри обработчика
     private static readonly AsyncLocal<bool> insideHandler = new();
 
-    // FlushAndCloseAsync ждёт этот сигнал; диспетчер завершает его, когда очередь опустела
-    // и обработчики последнего вынутого пакета отработали
-    private volatile TaskCompletionSource drained;
+    // запрос закрытия. Drain: true — доставить остаток (FlushAndCloseAsync), false — отбросить
+    // (Close/Dispose). Done — TCS, который диспетчер завершает после Disconnect (для
+    // FlushAndCloseAsync); для Close/Dispose ждать некому, поэтому null. Drain изменяемо: отмена
+    // FlushAndCloseAsync переводит остаток в отбрасывание (см. FlushAndCloseAsync)
+    private sealed class CloseRequest
+    {
+        public volatile bool Drain;
+        public readonly TaskCompletionSource Done;
 
-    // 1, пока диспетчер вынул пакет и ещё не закончил его обработчики: без этого
-    // FlushAndCloseAsync мог бы увидеть пустую очередь и вернуться посреди обработчика
-    private int inFlight;
+        public CloseRequest(bool drain, TaskCompletionSource done)
+        {
+            Drain = drain;
+            Done = done;
+        }
+    }
 
     private void ThreadSafeExec(bool isOpen, Action fn, Action errorHandler = null)
     {
@@ -158,26 +174,67 @@ public class MTRFXXAdapter : IDisposable
 
         while (await reader.WaitToReadAsync().ConfigureAwait(false))
         {
-            // inFlight поднимается ДО вынимания: иначе между TryRead (Count стал 0)
-            // и inFlight=1 FlushAndCloseAsync увидел бы "пусто и никто не занят"
-            Volatile.Write(ref inFlight, 1);
-
-            try
+            while (reader.TryRead(out var item))
             {
-                while (reader.TryRead(out var bytes))
+                var req = Volatile.Read(ref pendingClose);
+
+                // немедленное закрытие: пакет, обработка которого ещё не начата, отбрасывается.
+                // проверка ДО Dispatch, поэтому уже начатый пакет (мы внутри его Dispatch) сюда
+                // не попадает - он доигрывает целиком, и лишь потом закрытие
+                if (req is { Drain: false })
                 {
-                    // между выниманием и вызовом обработчиков мог случиться Close: тогда пакет
-                    // отбрасывается, чтобы после Disconnect не было ни одного события
-                    if (!closing) Dispatch(bytes);
+                    Complete(req);
+                    break;
                 }
-            }
-            finally
-            {
-                Volatile.Write(ref inFlight, 0);
+
+                // WAKE - только будильник, не пакет; обычный режим и Drain:true доставляют
+                if (!ReferenceEquals(item, WAKE)) Dispatch(item);
             }
 
-            // очередь вычитана до дна и обработчики отработали - сигнал FlushAndCloseAsync
-            drained?.TrySetResult();
+            // очередь опустела: если ждали доставки остатка (или отмена перевела в отбрасывание),
+            // диспетчер здесь и закрывает - Disconnect вызывается между пакетами, не поверх них
+            var pending = Volatile.Read(ref pendingClose);
+            if (pending != null) Complete(pending);
+        }
+    }
+
+    // отбросить/оставить остаток, снять запрос, вызвать Disconnect (последним), разбудить
+    // ожидающий FlushAndCloseAsync. Всегда из потока диспетчера - ни один обработчик пакета
+    // в этот момент не выполняется
+    private void Complete(CloseRequest req)
+    {
+        // снять именно свой запрос. если Open уже сбросил pendingClose (реоткрытие) или другой
+        // путь уже закрыл - CAS не пройдёт, и мы не трогаем очередь и не шлём лишний Disconnect
+        // (иначе устаревший Close отбросил бы пакет, пришедший уже после Open)
+        if (Interlocked.CompareExchange(ref pendingClose, null, req) != req) return;
+
+        if (!req.Drain) DiscardQueue();
+
+        RaiseDisconnect();
+        req.Done?.TrySetResult();
+    }
+
+    // опубликовать запрос закрытия; если он уже опубликован - вернуть существующий (первый
+    // выигрывает: повторный Close или Close после FlushAndCloseAsync не создаёт второго закрытия)
+    private CloseRequest RequestClose(bool drain)
+    {
+        var req = new CloseRequest(drain,
+            drain ? new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously) : null);
+
+        return Interlocked.CompareExchange(ref pendingClose, req, null) ?? req;
+    }
+
+    // Disconnect вызывается из потока диспетчера; исключение обработчика не должно убить
+    // диспетчер - уводим его в Error, как и для обработчиков пакетов
+    private void RaiseDisconnect()
+    {
+        try
+        {
+            Disconnect?.Invoke(this);
+        }
+        catch (Exception ex)
+        {
+            RaiseError(ex);
         }
     }
 
@@ -254,7 +311,7 @@ public class MTRFXXAdapter : IDisposable
     {
         ThreadSafeExec(false, () =>
         {
-            closing = false;
+            Volatile.Write(ref pendingClose, null);
             device.Open();
             timer.Change(0, READING_INTERVAL);
             Connect?.Invoke(this);
@@ -263,25 +320,36 @@ public class MTRFXXAdapter : IDisposable
 
     /// <summary>
     /// Закрыть порт немедленно. Пакеты, принятые, но ещё не доставленные обработчикам,
-    /// <b>отбрасываются</b>. Чтобы дождаться их обработки, используйте
-    /// <see cref="FlushAndCloseAsync"/>.
+    /// <b>отбрасываются</b>. Вызов возвращается сразу после закрытия порта и <b>не дожидается</b>
+    /// события <see cref="Disconnect"/>: оно вызывается вскоре из потока доставки и остаётся
+    /// последним. Чтобы дождаться обработки остатка, используйте <see cref="FlushAndCloseAsync"/>.
+    /// Безопасно вызывать изнутри обработчика события.
     /// </summary>
     public void Close()
     {
+        var wasOpen = false;
+
+        // под замком - только закрыть порт и остановить таймер (новых пакетов не будет);
+        // отбрасывание остатка и Disconnect - в потоке диспетчера
         ThreadSafeExec(true, () =>
         {
-            closing = true;
+            wasOpen = true;
             timer.Change(Timeout.Infinite, READING_INTERVAL);
             device.Close();
-            DiscardQueue();
-            Disconnect?.Invoke(this);
         });
+
+        if (!wasOpen) return;
+
+        RequestClose(drain: false);
+        queue.Writer.TryWrite(WAKE); // разбудить диспетчер, если он спит на пустой очереди
     }
 
     /// <summary>
     /// Закрыть порт немедленно, но дождаться, пока все уже принятые пакеты будут доставлены
-    /// обработчикам; затем вызвать <see cref="Disconnect"/>. По возврату очередь пуста.
-    /// Отмена через <paramref name="cancellationToken"/> — остаток отбрасывается.
+    /// обработчикам; затем вызывается <see cref="Disconnect"/>, затем возврат. По возврату
+    /// очередь пуста и <see cref="Disconnect"/> уже вызван.
+    /// Отмена через <paramref name="cancellationToken"/> — остаток отбрасывается,
+    /// <see cref="Disconnect"/> всё равно происходит.
     /// Нельзя вызывать изнутри обработчика события — диспетчер ждал бы сам себя.
     /// </summary>
     public async Task FlushAndCloseAsync(CancellationToken cancellationToken = default)
@@ -291,39 +359,37 @@ public class MTRFXXAdapter : IDisposable
                 "FlushAndCloseAsync cannot be awaited from inside an event handler: " +
                 "the dispatcher would wait for itself");
 
-        var wait = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var wasOpen = false;
 
-        // порт закрывается сразу - новых пакетов не будет; очередь НЕ очищается,
-        // closing НЕ ставится - диспетчер должен доработать остаток
+        // порт закрывается сразу - новых пакетов не будет; очередь НЕ очищается -
+        // диспетчер должен доработать остаток
         ThreadSafeExec(true, () =>
         {
             wasOpen = true;
             timer.Change(Timeout.Infinite, READING_INTERVAL);
             device.Close();
-            drained = wait;
         });
 
         if (!wasOpen) return;
 
+        var req = RequestClose(drain: true);
+        queue.Writer.TryWrite(WAKE);
+
+        // Close мог опередить (CAS вернул чужой запрос без Done) - остаток уже отбрасывается,
+        // ждать нечего
+        if (req.Done == null) return;
+
         try
         {
-            // если очередь уже пуста и диспетчер не внутри обработчиков - ждать нечего
-            // (и сигнала не будет: диспетчер спит на WaitToReadAsync). иначе ждём:
-            // диспетчер сигналит после обработчиков последнего пакета
-            if (queue.Reader.Count > 0 || Volatile.Read(ref inFlight) != 0)
-                await wait.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
+            await req.Done.Task.WaitAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
-            DiscardQueue();
+            // перевести остаток в отбрасывание: диспетчер, дойдя до следующего пакета, увидит
+            // Drain:false и отбросит остаток. Disconnect всё равно вызовет Complete
+            req.Drain = false;
+            queue.Writer.TryWrite(WAKE);
             throw;
-        }
-        finally
-        {
-            drained = null;
-            closing = true;
-            Disconnect?.Invoke(this);
         }
     }
 
