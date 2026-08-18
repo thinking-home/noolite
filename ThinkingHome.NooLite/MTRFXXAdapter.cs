@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO.Ports;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -42,11 +41,7 @@ public class MTRFXXAdapter : IDisposable
 
     public const int DEFAULT_QUEUE_CAPACITY = 128;
 
-    // запись выполняется под тем же lockObject, что и чтение по таймеру,
-    // поэтому бесконечное ожидание на записи остановило бы приём пакетов
-    private const int WRITE_TIMEOUT = 500;
-
-    private readonly SerialPort device;
+    private readonly ISerialDevice device;
     private readonly Timer timer;
 
     // принятые из порта пакеты; поток таймера только кладёт, диспетчер вынимает и разбирает
@@ -88,19 +83,28 @@ public class MTRFXXAdapter : IDisposable
             }
     }
 
-    /// <param name="portName">Имя последовательного порта адаптера.</param>
+    /// <param name="portName">Имя последовательного порта адаптера (9600 бод, таймаут записи 500 мс).</param>
     /// <param name="queueCapacity">
     /// Ёмкость очереди принятых пакетов. При переполнении новый пакет отбрасывается, очередь
     /// сохраняет уже принятые в порядке прихода; число отброшенных доступно через
     /// <see cref="DroppedPacketsCount"/>.
     /// </param>
     public MTRFXXAdapter(string portName, int queueCapacity = DEFAULT_QUEUE_CAPACITY)
+        : this(new SerialPortDevice(portName), queueCapacity)
     {
+    }
+
+    // шов для тестов: подставной порт вместо SerialPort. поведение адаптера от реализации
+    // порта не зависит - он использует только члены ISerialDevice
+    internal MTRFXXAdapter(ISerialDevice device, int queueCapacity = DEFAULT_QUEUE_CAPACITY)
+    {
+        ArgumentNullException.ThrowIfNull(device);
+
         if (queueCapacity < 1)
             throw new ArgumentOutOfRangeException(nameof(queueCapacity), queueCapacity,
                 "queue capacity must be positive");
 
-        device = new SerialPort(portName, 9600) { WriteTimeout = WRITE_TIMEOUT };
+        this.device = device;
         timer = new Timer(TimerCallback, null, Timeout.Infinite, READING_INTERVAL);
 
         // при переполнении отбрасывается НОВЫЙ пакет (DropWrite): очередь отдаёт пакеты
